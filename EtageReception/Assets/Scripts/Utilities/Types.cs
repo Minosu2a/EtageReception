@@ -10,3 +10,12 @@ public enum EGameState
     NONE
 
 }
+
+public enum ESoundType
+{
+    ONESHOT2D,
+    REPETITIVE2D,
+    ONESHOT3D,
+    REPETITIVE3D,
+    NONE
+};
