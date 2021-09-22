@@ -16,10 +16,13 @@ public class CharacterController : MonoBehaviour
     private Vector3 _posMouse = Vector3.zero;
     private Vector3 _mouseRotdir = Vector3.zero;
 
+    [Header("Grab")]
+    private bool _isGrabbing = false;
 
-     [SerializeField] private GrabDetection _grabDetection = null;
-     [SerializeField] private GameObject _centerGrabPoint = null;
+    [SerializeField] private GrabDetection _grabDetection = null;
+    [SerializeField] private GameObject _centerGrabPoint = null;
 
+    private GameObject _objectGrabbed = null;
 
     #endregion Fields
 
@@ -45,29 +48,26 @@ public class CharacterController : MonoBehaviour
     private void Update()
     {
       
-
+       
 
         Walk();
 
-        if(_rb.velocity != Vector3.zero)
-        {
-            _isMoving = true;
-        }
-        else
-        {
-            _isMoving = false; 
-        }
+       // Look();
+
     }
 
 
     private void Look()
     {
-        transform.forward = _rb.velocity;
+        if(_rb.velocity.magnitude >= 0.4f)
+        {
+            transform.forward = _rb.velocity.normalized;
+        }
     }
 
     public void Walk()
     {
-        _rb.velocity = InputManager.Instance.MoveDir * _walkSpeed;
+        _rb.velocity = InputManager.Instance.MoveDir * _walkSpeed * Time.deltaTime;
     }
 
     public void Sprint()
@@ -77,13 +77,14 @@ public class CharacterController : MonoBehaviour
 
     public void Grab()
     {
-        if(_grabDetection.GrabRangeObject.Count >= 0)
+        if(_grabDetection.GrabRangeObject.Count > 0 && _isGrabbing == false)
         {
+
+            float smallerDistance = 0;
+            int integerOfCloserObject = 0;
+
             for (int i =0; i < _grabDetection.GrabRangeObject.Count; i++ )
             {
-
-                float smallerDistance = 0;
-                int integerOfCloserObject = 0;
 
                 float dist = Vector3.Distance(_grabDetection.GrabRangeObject[i].transform.position, _centerGrabPoint.transform.position);
 
@@ -97,14 +98,19 @@ public class CharacterController : MonoBehaviour
                     smallerDistance = dist;
                     integerOfCloserObject = i;
                 }
-
-                FixedJoint fj = _grabDetection.GrabRangeObject[i].AddComponent<FixedJoint>();
-                fj.connectedBody = _rb;
-
-                // _centerGrabPoint
-                // _grabDetection.GrabRangeObject[i].transform.position;
             }
 
+            _objectGrabbed = _grabDetection.GrabRangeObject[integerOfCloserObject];
+            FixedJoint fj = _objectGrabbed.AddComponent<FixedJoint>();
+            fj.connectedBody = _rb;
+            fj.breakForce = 9001;
+            _isGrabbing = true;
+
+        }
+        else if(_isGrabbing == true)
+        {
+            Destroy(_objectGrabbed.GetComponent<FixedJoint>());
+            _isGrabbing = false;
         }
 
     }

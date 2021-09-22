@@ -54,21 +54,25 @@ public class InputManager : Singleton<InputManager>
 
         #endregion Movement & Rotation
 
-
-        if (Input.GetKey(_grabInput))
+        if(CharacterManager.Instance.CharacterController != null)
         {
-            CharacterManager.Instance.CharacterController.Grab();
+            if (Input.GetKeyDown(_grabInput))
+            {
+                CharacterManager.Instance.CharacterController.Grab();
+            }
+
+            if (Input.GetKey(_jumpInput))
+            {
+
+            }
+
+            if (Input.GetKey(_dashInput))
+            {
+
+            }
         }
 
-        if (Input.GetKey(_jumpInput))
-        {
-
-        }
-
-        if (Input.GetKey(_dashInput))
-        {
-
-        }
+     
 
     }
     #endregion Methods
