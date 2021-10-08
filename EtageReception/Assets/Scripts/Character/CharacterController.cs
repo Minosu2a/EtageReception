@@ -54,7 +54,7 @@ public class CharacterController : MonoBehaviour
 
         Walk();
 
-       // Look();
+        Look();
 
     }
 
@@ -130,7 +130,9 @@ public class CharacterController : MonoBehaviour
                     float yrot = _objectGrabbed.transform.rotation.y;
                     float zrot = _objectGrabbed.transform.rotation.z;
 
-                   Vector3 t = _centerGrabPoint.transform.position -_objectGrabbed.transform.position;
+                   Vector3 dirAnchor = _centerGrabPoint.transform.position -_objectGrabbed.transform.position;
+                   Debug.Log(dirAnchor);
+                    fj.anchor = dirAnchor;
                    // t.normalized
 
                     _isGrabbing = true;
