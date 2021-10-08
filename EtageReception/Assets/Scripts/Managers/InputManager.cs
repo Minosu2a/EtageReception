@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InputManager : Singleton<InputManager>
+public class InputManagerE : Singleton<InputManagerE>
 {
     #region Fields
     private Vector3 _moveDir = Vector3.zero;

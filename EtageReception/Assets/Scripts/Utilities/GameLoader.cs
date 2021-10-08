@@ -7,7 +7,7 @@ public class GameLoader : MonoBehaviour
 {
     [SerializeField] private GameStateManager _gameStateManager = null;
     [SerializeField] private GameLoopManager _gameLoopManager = null;
-    [SerializeField] private InputManager _inputManager = null;
+    [SerializeField] private InputManagerE _inputManager = null;
 
     [SerializeField] private EGameState _sceneToLoadFirst = EGameState.LEVEL1;
 

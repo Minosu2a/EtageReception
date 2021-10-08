@@ -5,12 +5,12 @@ using UnityEngine;
 public class CharacterManager : Singleton<CharacterManager>
 {
     #region Fields
-    private CharacterController _characterController = null;
+    private CharacterControllerE _characterController = null;
     #endregion Fields
 
 
     #region Property
-    public CharacterController CharacterController
+    public CharacterControllerE CharacterController
     {
 
         get
