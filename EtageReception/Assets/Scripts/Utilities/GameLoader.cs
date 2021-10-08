@@ -14,6 +14,8 @@ public class GameLoader : MonoBehaviour
         _gameStateManager.Initialize();
         _gameLoopManager.Initialize();
         _inputManager.Initialize();
-        GameStateManager.Instance.LaunchTransition(EGameState.MAINMENU);
+        GameStateManager.Instance.LaunchTransition(EGameState.LEVEL1);
     }
+
+
 }
