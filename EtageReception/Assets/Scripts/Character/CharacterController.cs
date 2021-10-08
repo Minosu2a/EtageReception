@@ -75,39 +75,52 @@ public class CharacterController : MonoBehaviour
         _rb.velocity = InputManager.Instance.MoveDir * _sprintSpeed;
     }
 
-    public void Grab()
+    public GameObject DetectObject()
     {
-        if(_grabDetection.GrabRangeObject.Count > 0 && _isGrabbing == false)
+        if (_grabDetection.GrabRangeObject.Count > 0)
         {
 
             float smallerDistance = 0;
             int integerOfCloserObject = 0;
 
-            for (int i =0; i < _grabDetection.GrabRangeObject.Count; i++ )
+            for (int i = 0; i < _grabDetection.GrabRangeObject.Count; i++)
             {
 
                 float dist = Vector3.Distance(_grabDetection.GrabRangeObject[i].transform.position, _centerGrabPoint.transform.position);
 
-                if(i == 0)
+                if (i == 0)
                 {
                     smallerDistance = dist;
                     integerOfCloserObject = i;
                 }
-                else if(dist < smallerDistance)
+                else if (dist < smallerDistance)
                 {
                     smallerDistance = dist;
                     integerOfCloserObject = i;
                 }
             }
 
-            _objectGrabbed = _grabDetection.GrabRangeObject[integerOfCloserObject];
-            FixedJoint fj = _objectGrabbed.AddComponent<FixedJoint>();
-            fj.connectedBody = _rb;
-            fj.breakForce = 9001;
-            _isGrabbing = true;
+            GameObject closestObject = _grabDetection.GrabRangeObject[integerOfCloserObject];
+            return closestObject;
 
         }
-        else if(_isGrabbing == true)
+
+        return null;
+    }
+
+    public void Grab()
+    {
+        if (_isGrabbing == false)
+        {
+            if((_objectGrabbed = DetectObject()) != null)
+            {
+                FixedJoint fj = _objectGrabbed.AddComponent<FixedJoint>();
+                fj.connectedBody = _rb;
+                fj.breakForce = 9001;
+                _isGrabbing = true;
+            }
+        }
+        else if (_isGrabbing == true)
         {
             Destroy(_objectGrabbed.GetComponent<FixedJoint>());
             _isGrabbing = false;
