@@ -24,6 +24,8 @@ public class CharacterController : MonoBehaviour
 
     private GameObject _objectGrabbed = null;
 
+    [SerializeField] private Rigidbody _trompeRigidbody = null;
+
     #endregion Fields
 
 
@@ -114,15 +116,34 @@ public class CharacterController : MonoBehaviour
         {
             if((_objectGrabbed = DetectObject()) != null)
             {
-                FixedJoint fj = _objectGrabbed.AddComponent<FixedJoint>();
-                fj.connectedBody = _rb;
-                fj.breakForce = 9001;
-                _isGrabbing = true;
+                if(_objectGrabbed.GetComponent<ConfigurableJoint>() != null)
+                {
+                    ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
+
+                    fj.connectedBody = _trompeRigidbody;
+
+                    fj.xMotion = ConfigurableJointMotion.Locked;
+                    fj.yMotion = ConfigurableJointMotion.Locked;
+                    fj.zMotion = ConfigurableJointMotion.Locked;
+
+                    float xrot = _objectGrabbed.transform.rotation.x;
+                    float yrot = _objectGrabbed.transform.rotation.y;
+                    float zrot = _objectGrabbed.transform.rotation.z;
+
+                   Vector3 t = _centerGrabPoint.transform.position -_objectGrabbed.transform.position;
+                   // t.normalized
+
+                    _isGrabbing = true;
+                }
             }
         }
         else if (_isGrabbing == true)
         {
-            Destroy(_objectGrabbed.GetComponent<FixedJoint>());
+            ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
+            fj.connectedBody = null;
+            fj.xMotion = ConfigurableJointMotion.Free;
+            fj.yMotion = ConfigurableJointMotion.Free;
+            fj.zMotion = ConfigurableJointMotion.Free;
             _isGrabbing = false;
         }
 
