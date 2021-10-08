@@ -24,6 +24,9 @@ public static class GameStateHelper
             case EGameState.BATTLE:
                 sceneName = "BattleScene";
                 break;
+            case EGameState.LEVEL1:
+                sceneName = "AdrienLD";
+                break;
         }
         return sceneName;
     }

@@ -7,6 +7,7 @@ public enum EGameState
     MAINMENU,
     GAME,
     BATTLE,
+    LEVEL1,
     NONE
 
 }
