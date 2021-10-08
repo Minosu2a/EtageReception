@@ -473,6 +473,7 @@ MonoBehaviour:
   _gameStateManager: {fileID: 1138470570}
   _gameLoopManager: {fileID: 145277961}
   _inputManager: {fileID: 283616908}
+  _sceneToLoadFirst: 5
 --- !u!4 &1501937221
 Transform:
   m_ObjectHideFlags: 0

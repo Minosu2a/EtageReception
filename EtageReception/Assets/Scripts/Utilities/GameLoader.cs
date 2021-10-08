@@ -9,12 +9,14 @@ public class GameLoader : MonoBehaviour
     [SerializeField] private GameLoopManager _gameLoopManager = null;
     [SerializeField] private InputManager _inputManager = null;
 
+    [SerializeField] private EGameState _sceneToLoadFirst = EGameState.LEVEL1;
+
     private void Start()
     {
         _gameStateManager.Initialize();
         _gameLoopManager.Initialize();
         _inputManager.Initialize();
-        GameStateManager.Instance.LaunchTransition(EGameState.LEVEL1);
+        GameStateManager.Instance.LaunchTransition(_sceneToLoadFirst);
     }
 
 
