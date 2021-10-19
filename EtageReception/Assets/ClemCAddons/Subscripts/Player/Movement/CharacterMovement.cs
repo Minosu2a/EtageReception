@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Luminosity.IO;
 using ClemCAddons.Utilities;
 using System.Diagnostics;
@@ -50,6 +50,8 @@ namespace ClemCAddons
             private float groundDistance;
             private float _fallingHeight = 0f;
             private bool _doNotMove = false;
+            private bool _ignoreInputs = false;
+
             private Collider _collider;
             private Rigidbody _rigidbody;
             private bool _firstTimeGround;
@@ -59,6 +61,7 @@ namespace ClemCAddons
             private TPSCameraWithNodeSupport _tpsCamera;
             private float _jumpDelay = 0;
             private float _postJumpDelay = 0;
+            private Vector3 _lastUnityVelocity = new Vector3(); // bug in rigidbody causes velocity to not reset on strong slopes
 
             public LayerMask CollisionLayer { get => _collisionLayer; set => _collisionLayer = value; }
             public Rigidbody Rigidbody
@@ -104,24 +107,27 @@ namespace ClemCAddons
                 _localVelocity = new Vector3();
                 groundDistance = GameTools.FindGround(transform.position, _collider.bounds.extents.y, 10, _collisionLayer, out RaycastHit hit);
                 _firstTimeGround = !_isOnGround && groundDistance <= 0.1; // if is on ground is false, has a chance to be true if it becomes true.
-                if(groundDistance <= 0.1 && _isOnGround && _postJumpDelay <= 0)
+                if (groundDistance <= 0.1 && _isOnGround && _postJumpDelay <= 0)
                 {
                     _postJumpDelay = _postJumpBuffering;
                 }
                 _isOnGround = groundDistance <= 0.1 || _postJumpDelay > 0;
-                if(groundDistance >= 0.1 && _postJumpDelay > 0)
+                if (groundDistance >= 0.1 && _postJumpDelay > 0)
                 {
                     _postJumpDelay -= Time.deltaTime;
                 }
-                _isFalling = _rigidbody.velocity.y < 0;
-                _fallingHeight = _firstTimeGround ? 0 : _fallingHeight;
+                _isFalling = _rigidbody.velocity.y < 0 && _lastUnityVelocity.y != _rigidbody.velocity.y;
+                _lastUnityVelocity = _rigidbody.velocity;
+                // bug in rigidbody causes velocity to not reset on strong slopes
+                _fallingHeight = !_isFalling ? 0 : _fallingHeight;
                 if (!_isOnGround && groundDistance <= _rigidbody.velocity.y.Abs() * _preJumpBuffering && _isFalling)
                 {
                     _isOnGround = true;
                 }
                 if (!_isOnGround && _isFalling && _direction.y > 0)
                 {
-                    _rigidbody.useGravity = false;
+                    if (_ignoreInputs == false)
+                        _rigidbody.useGravity = false;
                     if (Mathf.Abs(_rigidbody.velocity.y) > _maxGlidingFallSpeed)
                     {
                         _localVelocity.y += (_glidingDeceleration - _glidingGravity) * Time.smoothDeltaTime;
@@ -135,7 +141,8 @@ namespace ClemCAddons
                 }
                 else
                 {
-                    _rigidbody.useGravity = true;
+                    if (_ignoreInputs == false)
+                        _rigidbody.useGravity = true;
                     if (!_isOnGround && _isFalling)
                     {
                         _fallingHeight -= _rigidbody.velocity.y * Time.smoothDeltaTime; // y velocity is negative as _isfalling and !_isOnGround
@@ -146,7 +153,7 @@ namespace ClemCAddons
                 if (_isOnGround)
                 {
                     Vector3 r = hit.normal.ToQuaternion(transform.rotation).eulerAngles.SetY(0);
-                    if (r.x.MinusAngle(0,true).Abs() > _maxGroundAdaptation)
+                    if (r.x.MinusAngle(0, true).Abs() > _maxGroundAdaptation)
                     {
                         r.x = transform.Find("Base").eulerAngles.x;
                     }
@@ -166,7 +173,7 @@ namespace ClemCAddons
                 _localVelocity.x = _direction.x * _inputMultiplier;
                 _localVelocity.z = _direction.z * _inputMultiplier;
                 _localVelocity = _localVelocity.ClampXZTotal(_inputMultiplier);
-                Vector3 _aim = (_isUsingTPS? _tpsCamera.transform:_camera.transform).forward;
+                Vector3 _aim = (_isUsingTPS ? _tpsCamera.transform : _camera.transform).forward;
                 _aim.y = 0;
                 if (_aim == new Vector3())
                 {
@@ -175,7 +182,7 @@ namespace ClemCAddons
                 ApplyImpulse();
                 _localVelocity = _doNotMove ? new Vector3() : _localVelocity;
                 _immediateImpulse = _doNotMove ? new Vector3() : _immediateImpulse;
-                if ((_localVelocity + _immediateImpulse) == Vector3.zero)
+                if ((_localVelocity + _immediateImpulse) == Vector3.zero && !_ignoreInputs)
                 {
                     _rigidbody.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
                 }
@@ -188,7 +195,7 @@ namespace ClemCAddons
                 velocityFinal = velocityFinal.ClampXZKeepRelation(-_maxSpeed, _maxSpeed);
                 velocityFinal = velocityFinal.ClampXZTotal(_maxSpeed);
                 velocityFinal = velocityFinal.ClampY(-_maxFallSpeed, _maxFallSpeed);
-                _rigidbody.velocity = _immediateImpulse + velocityFinal;
+                _rigidbody.velocity = _immediateImpulse + (_ignoreInputs ? _rigidbody.velocity : velocityFinal);
                 _immediateImpulse = new Vector3();
             }
 
@@ -196,14 +203,22 @@ namespace ClemCAddons
             {
                 _doNotMove = !canMove;
             }
+            public void SetIgnoreInput(bool ignoreInput)
+            {
+                _ignoreInputs = ignoreInput;
+            }
+
             //private bool _tempStoreOfValue = false;
             //private Stopwatch stopwatch = new Stopwatch();
             private void UpdateInputs()
             {
-                _direction.x = InputManager.GetAxis("Horizontal");
-                _direction.z = InputManager.GetAxis("Vertical");
-                _direction.y = InputManager.GetButton("Jump") ? 1 : 0;
-                // ###### A UTILISER SI IL Y A BESOIN DE MESURER la durée d'arrêt complet ######
+                if (!_ignoreInputs)
+                {
+                    _direction.x = InputManager.GetAxis("Horizontal");
+                    _direction.z = InputManager.GetAxis("Vertical");
+                    _direction.y = InputManager.GetButton("Jump") ? 1 : 0;
+                }
+                // ###### A UTILISER SI IL Y A BESOIN DE MESURER la durï¿½e d'arrï¿½t complet ######
                 //if(Mathf.Abs(_direction.x) == 1)
                 //{
                 //    _tempStoreOfValue = true;
@@ -253,7 +268,7 @@ namespace ClemCAddons
                 _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, 0, _rigidbody.velocity.z);
             }
 
-            
+
             public void AddImpulse(Vector3 value)
             {
                 _immediateImpulse += value;
