@@ -70,14 +70,14 @@ public class RagdollController : MonoBehaviour
             for(int i = 0; i < r.Length; i++)
                 CopyJointAnimation(r[i]);
         _currentAnimation = animation;
-        Timer.StartTimer(0, Mathf.RoundToInt(animation.Anim.clip.length * 1000), StopCurrentAnimation, false);
+        ClemCAddons.Utilities.Timer.StartTimer(0, Mathf.RoundToInt(animation.Anim.clip.length * 1000), StopCurrentAnimation, false);
     }
 
     public void StopCurrentAnimation()
     {
         if(_currentAnimation.HasValue)
         {
-            Timer.StopTimer(0);
+            ClemCAddons.Utilities.Timer.StopTimer(0);
             var r = joints.FindAll(t => _currentAnimation.Value.UsedJoints.Contains(t.GetComponent<ConfigurableJoint>())).Select(t => t.GetComponent<CopyMotion>()).ToArray();
             if (r != null)
                 for (int i = 0; i < r.Length; i++)
