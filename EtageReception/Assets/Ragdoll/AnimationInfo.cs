@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AnimationInfo : MonoBehaviour
+[Serializable]
+public class AnimationInfo
 {
-    [SerializeField] private List<InfoAnimation?> _animations;
+    [SerializeField] private List<InfoAnimation> _animations;
 
-    public List<InfoAnimation?> Animations { get => _animations; set => _animations = value; }
+    public List<InfoAnimation> Animations { get => _animations; set => _animations = value; }
 
     [Serializable]
     public struct InfoAnimation

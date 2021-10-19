@@ -56,10 +56,10 @@ public class RagdollController : MonoBehaviour
     public void PlayAnimationByName(string name)
     {
         // standard behavior will ignore the second condition if the first is false, avoiding running into a potential error
-        var r = _animations.Animations.Find(t => t.HasValue && t.Value.Name == name);
-        if(r.HasValue)
+        var r = _animations.Animations.Where(t => t.Name == name);
+        if(r.Any())
         {
-            StartAnimation(r.Value);
+            StartAnimation(r.First());
         }
     }
 
