@@ -14,7 +14,7 @@ public class AnimationInfo
     public struct InfoAnimation
     {
         public string Name;
-        public Animation Anim;
+        public AnimationClip Anim;
         public List<ConfigurableJoint> UsedJoints;
     }
 

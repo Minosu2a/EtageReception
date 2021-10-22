@@ -930,6 +930,13 @@ namespace ClemCAddons
             var r = gameObject.transform.FindDeep(name);
             return r == null ? null : r.gameObject;
         }
+        public static Transform GetParent(this Transform transform, int i)
+        {
+            if (i == 1)
+                return transform.parent;
+            else
+                return transform.parent.GetParent(i - 1);
+        }
         #endregion Transform Additions
         #region Distances
         public static float Distance(this Transform transform, Transform compared) // transform transform
