@@ -208,6 +208,9 @@ namespace Luminosity.IO
 				case "Negative":
 					binding.Negative = InputBinding.StringToKey(child.InnerText);
 					break;
+                case "DeadZoneType":
+					binding.DeadZoneType = InputBinding.StringToDeadZoneType(child.InnerText);
+					break;
 				case "DeadZone":
 					binding.DeadZone = ReadAsFloat(child);
 					break;
@@ -216,6 +219,9 @@ namespace Luminosity.IO
 					break;
 				case "Sensitivity":
 					binding.Sensitivity = ReadAsFloat(child, 1.0f);
+					break;
+                case "Scale":
+					binding.Scale = ReadAsFloat(child, 1.0f);
 					break;
 				case "Snap":
 					binding.Snap = ReadAsBool(child);
@@ -238,7 +244,7 @@ namespace Luminosity.IO
 				case "GamepadAxis":
 					binding.GamepadAxis = InputBinding.StringToGamepadAxis(child.InnerText);
 					break;
-				case "GamepadPlayer":
+				case "GamepadIndex":
 					binding.GamepadIndex = InputBinding.StringToGamepadIndex(child.InnerText);
 					break;
 				}

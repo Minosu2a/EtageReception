@@ -1,5 +1,4 @@
-﻿
-#region [Copyright (c) 2018 Cristian Alexandru Geambasu]
+﻿#region [Copyright (c) 2018 Cristian Alexandru Geambasu]
 //	Distributed under the terms of an MIT-style license:
 //
 //	The MIT License
@@ -28,12 +27,48 @@ namespace Luminosity.IO
 	public static class GamepadState
 	{
 		private static bool m_hasWarningBeenDisplayed = false;
+        private static IGamepadStateAdapter m_adapter = null;
 
-		public static IGamepadStateAdapter Adapter { get; set; }
+		public static IGamepadStateAdapter Adapter
+        {
+            get { return m_adapter; }
+            set
+            {
+                if(value != m_adapter)
+                {
+                    m_adapter = value;
 
-        public static bool IsGamepadSupported => Adapter != null;
+                    GamepadStateService service = InputManager.GetService<GamepadStateService>();
+                    if(service != null)
+                    {
+                        service.SetAdapter(m_adapter);
+                    }
+                }
+            }
+        }
 
-		public static bool IsConnected(GamepadIndex gamepad)
+        public static bool IsGamepadSupported
+        {
+            get { return Adapter != null; }
+        }
+
+        public static bool AnyInput()
+        {
+            PrintMissingAdapterWarningIfNecessary();
+            
+            GamepadStateService service = InputManager.GetService<GamepadStateService>();
+            return service != null ? service.AnyInput(GamepadIndex.GamepadOne) : false;
+        }
+
+        public static bool AnyInput(GamepadIndex gamepad)
+        {
+            PrintMissingAdapterWarningIfNecessary();
+            
+            GamepadStateService service = InputManager.GetService<GamepadStateService>();
+            return service != null ? service.AnyInput(gamepad) : false;
+        }
+
+        public static bool IsConnected(GamepadIndex gamepad)
 		{
 			PrintMissingAdapterWarningIfNecessary();
 			return Adapter != null ? Adapter.IsConnected(gamepad) : false;
@@ -72,13 +107,13 @@ namespace Luminosity.IO
 		public static void SetVibration(GamepadVibration vibration, GamepadIndex gamepad)
 		{
 			PrintMissingAdapterWarningIfNecessary();
-			if(Adapter != null) Adapter.SetVibration(vibration, gamepad);
+			Adapter.SetVibration(vibration, gamepad);
 		}
 
 		public static GamepadVibration GetVibration(GamepadIndex gamepad)
 		{
 			PrintMissingAdapterWarningIfNecessary();
-			return Adapter != null ? Adapter.GetVibration(gamepad) : new GamepadVibration();
+			return Adapter != null ? Adapter.GetVibration(gamepad) : GamepadVibration.None;
 		}
 
 		private static void PrintMissingAdapterWarningIfNecessary()

@@ -27,6 +27,7 @@ using UnityEditor.Callbacks;
 #endif
 using System;
 using System.Collections.Generic;
+using UnityEngine.Profiling;
 
 namespace Luminosity.IO
 {
@@ -40,8 +41,6 @@ namespace Luminosity.IO
 
 	public partial class InputManager : MonoBehaviour
 	{
-		public const string VERSION = "2019.3.30";
-
 		[SerializeField]
 		private List<ControlScheme> m_controlSchemes = new List<ControlScheme>();
 		[SerializeField]
@@ -54,8 +53,10 @@ namespace Luminosity.IO
 		private string m_playerFourDefault;
 		[SerializeField]
 		private bool m_ignoreTimescale = true;
+        [SerializeField]
+        private bool m_runScanningInLateUpdate = false;
 
-		private ControlScheme m_playerOneScheme;
+        private ControlScheme m_playerOneScheme;
 		private ControlScheme m_playerTwoScheme;
 		private ControlScheme m_playerThreeScheme;
 		private ControlScheme m_playerFourScheme;
@@ -68,7 +69,8 @@ namespace Luminosity.IO
 		private Action m_afterUpdateHandler;
 		private RemoteUpdateDelegate m_remoteUpdateHandler;
 		private static InputManager m_instance;
-		
+
+        private Dictionary<Type, IInputService> m_services;
 		private Dictionary<string, ControlScheme> m_schemeLookup;
 		private Dictionary<string, ControlScheme> m_schemeLookupByID;
 		private Dictionary<string, Dictionary<string, InputAction>> m_actionLookup;
@@ -114,9 +116,11 @@ namespace Luminosity.IO
 			{
 				m_instance = this;
 				m_scanService = new ScanService();
+                m_services = new Dictionary<Type, IInputService>();
 				m_schemeLookup = new Dictionary<string, ControlScheme>();
 				m_schemeLookupByID = new Dictionary<string, ControlScheme>();
 				m_actionLookup = new Dictionary<string, Dictionary<string, InputAction>>();
+                AddDefaultServices();
 				Initialize();
 			}
 			else
@@ -126,7 +130,7 @@ namespace Luminosity.IO
 			}
 		}
 
-		private void OnDestroy()
+        private void OnDestroy()
 		{
 			if(m_instance == this)
 			{
@@ -138,7 +142,18 @@ namespace Luminosity.IO
 			m_loadedHandler = null;
 			m_savedHandler = null;
 			m_remoteUpdateHandler = null;
+
+            foreach(var entry in m_services)
+                entry.Value.Shutdown();
+
+            m_services.Clear();
 		}
+
+        private void AddDefaultServices()
+        {
+            AddServiceInternal<KeyboardStateService>();
+            AddServiceInternal<GamepadStateService>();
+        }
 
 		private void Initialize()
 		{
@@ -206,25 +221,47 @@ namespace Luminosity.IO
 
 		private void Update()
 		{
-			if(m_beforeUpdateHandler != null)
-				m_beforeUpdateHandler();
+            Profiler.BeginSample("OnBeforeUpdate", this);
+            if(m_beforeUpdateHandler != null)
+                m_beforeUpdateHandler();
 
-			UpdateControlScheme(m_playerOneScheme, PlayerID.One);
+            foreach(var item in m_services.Values)
+                item.OnBeforeUpdate();
+
+            Profiler.EndSample();
+
+            Profiler.BeginSample("Update", this);
+            UpdateControlScheme(m_playerOneScheme, PlayerID.One);
 			UpdateControlScheme(m_playerTwoScheme, PlayerID.Two);
 			UpdateControlScheme(m_playerThreeScheme, PlayerID.Three);
 			UpdateControlScheme(m_playerFourScheme, PlayerID.Four);
+            if(!m_runScanningInLateUpdate)
+            {
+                UpdateScanService();
+            }
+            Profiler.EndSample();
 
-			m_scanService.GameTime = m_ignoreTimescale ? Time.unscaledTime : Time.time;
-			if(m_scanService.IsScanning)
-			{
-				m_scanService.Update();
-			}
+            Profiler.BeginSample("OnAfterUpdate", this);
+            if(m_afterUpdateHandler != null)
+                m_afterUpdateHandler();
 
-			if(m_afterUpdateHandler != null)
-				m_afterUpdateHandler();
-		}
+            foreach(var item in m_services.Values)
+                item.OnAfterUpdate();
 
-		private void UpdateControlScheme(ControlScheme scheme, PlayerID playerID)
+            Profiler.EndSample();
+        }
+
+        private void LateUpdate()
+        {
+            if(m_runScanningInLateUpdate)
+            {
+                Profiler.BeginSample("LateUpdate", this);
+                UpdateScanService();
+                Profiler.EndSample();
+            }
+        }
+
+        private void UpdateControlScheme(ControlScheme scheme, PlayerID playerID)
 		{
 			if(scheme != null)
 			{
@@ -236,7 +273,16 @@ namespace Luminosity.IO
 			}
 		}
 
-		private void SetControlSchemeByPlayerID(PlayerID playerID, ControlScheme scheme)
+        private void UpdateScanService()
+        {
+            m_scanService.GameTime = m_ignoreTimescale ? Time.unscaledTime : Time.time;
+            if(m_scanService.IsScanning)
+            {
+                m_scanService.Update();
+            }
+        }
+
+        private void SetControlSchemeByPlayerID(PlayerID playerID, ControlScheme scheme)
 		{
 			if(playerID == PlayerID.One)
 				m_playerOneScheme = scheme;
@@ -275,6 +321,47 @@ namespace Luminosity.IO
 
 			return null;
 		}
+
+        private T AddServiceInternal<T>() where T : class, IInputService, new()
+        {
+            if(!m_services.ContainsKey(typeof(T)))
+            {
+                T service = new T();
+                service.Startup();
+
+                m_services[typeof(T)] = service;
+            }
+
+            return m_services[typeof(T)] as T;
+        }
+
+        private void RemoveServiceInternal<T>() where T : IInputService
+        {
+            if(IsDefaultService<T>())
+                return;
+
+            IInputService service = null;
+            if(m_services.TryGetValue(typeof(T), out service))
+            {
+                service.Shutdown();
+                m_services.Remove(typeof(T));
+            }
+        }
+
+        private bool IsDefaultService<T>() where T : IInputService
+        {
+            return typeof(T) == typeof(KeyboardStateService) ||
+                typeof(T) == typeof(GamepadStateService);
+        }
+
+        private T GetServiceInternal<T>() where T : class, IInputService
+        {
+            IInputService service = null;
+            if(m_services.TryGetValue(typeof(T), out service))
+                return (T)service;
+
+            return null;
+        }
 
 		public void SetSaveData(SaveData saveData)
 		{
@@ -836,6 +923,44 @@ namespace Luminosity.IO
 			return false;
 		}
 
+        public static bool IsKeyUsedInAnyControlScheme(KeyCode key, out KeyUsageResult usage)
+        {
+            usage = KeyUsageResult.None;
+
+            foreach(var scheme in m_instance.m_controlSchemes)
+            {
+                if(scheme.IsKeyUsedInAnyAction(key, out usage))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsKeyUsedInAnyControlScheme(KeyCode key)
+        {
+            foreach(var scheme in m_instance.m_controlSchemes)
+            {
+                if(scheme.IsKeyUsedInAnyAction(key))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsKeyUsedInControlScheme(string controlSchemeName, KeyCode key, out KeyUsageResult usage)
+        {
+            ControlScheme scheme = GetControlScheme(controlSchemeName);
+            usage = KeyUsageResult.None;
+
+            return scheme != null ? scheme.IsKeyUsedInAnyAction(key, out usage) : false;
+        }
+
+        public static bool IsKeyUsedInControlScheme(string controlSchemeName, KeyCode key)
+        {
+            ControlScheme scheme = GetControlScheme(controlSchemeName);
+            return scheme.IsKeyUsedInAnyAction(key);
+        }
+
 		public static void StartInputScan(ScanSettings settings, ScanHandler scanHandler)
 		{
 			m_instance.m_scanService.Start(settings, scanHandler);
@@ -845,6 +970,28 @@ namespace Luminosity.IO
 		{
 			m_instance.m_scanService.Stop();
 		}
+
+        public static T AddService<T>() where T : class, IInputService, new()
+        {
+            if(m_instance != null)
+                return m_instance.AddServiceInternal<T>();
+
+            return null;
+        }
+
+        public static void RemoveService<T>() where T : IInputService
+        {
+            if(m_instance != null)
+                m_instance.RemoveServiceInternal<T>();
+        }
+
+        public static T GetService<T>() where T : class, IInputService
+        {
+            if(m_instance != null)
+                return m_instance.GetServiceInternal<T>();
+
+            return null;
+        }
 
 		/// <summary>
 		/// Saves the control schemes in an XML file, in Application.persistentDataPath.

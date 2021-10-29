@@ -65,9 +65,9 @@ namespace LuminosityEditor.IO
 		private GUIStyle m_whiteLabel;
 		private GUIStyle m_whiteFoldout;
 		private GUIStyle m_warningLabel;
-		private bool m_isResizingHierarchy = false;
-		private bool m_tryedToFindInputManagerInScene = false;
-		private bool m_isDisposed = false;
+		private bool m_isResizingHierarchy;
+		private bool m_triedToFindInputManagerInScene;
+		private bool m_isDisposed;
 		private string[] m_axisOptions;
 		private string[] m_joystickOptions;
 		#endregion
@@ -93,7 +93,7 @@ namespace LuminosityEditor.IO
 			EditorToolbox.ShowStartupWarning();
 			IsOpen = true;
 
-			m_tryedToFindInputManagerInScene = false;
+			m_triedToFindInputManagerInScene = false;
 			if(m_inputManager == null)
 				m_inputManager = UnityObject.FindObjectOfType<InputManager>();
 			if(m_searchResults == null)
@@ -545,7 +545,7 @@ namespace LuminosityEditor.IO
 		{
 			EnsureGUIStyles();
 
-			if(m_inputManager == null && !m_tryedToFindInputManagerInScene)
+			if(m_inputManager == null && !m_triedToFindInputManagerInScene)
 				TryToFindInputManagerInScene();
 
 			if(m_inputManager == null)
@@ -990,15 +990,26 @@ namespace LuminosityEditor.IO
 				binding.Type == InputType.MouseAxis || binding.Type == InputType.GamepadAxis)
 			{
 				binding.Sensitivity = EditorGUILayout.FloatField(m_sensitivityInfo, binding.Sensitivity);
-			}
+            }
 
-			if(binding.Type == InputType.AnalogAxis || binding.Type == InputType.GamepadAxis ||
+            if(binding.Type == InputType.DigitalAxis || binding.Type == InputType.AnalogAxis ||
+                binding.Type == InputType.GamepadAxis)
+            {
+                binding.Scale = EditorGUILayout.FloatField("Scale", binding.Scale);
+            }
+
+            if(binding.Type == InputType.AnalogAxis || binding.Type == InputType.GamepadAxis ||
 				binding.Type == InputType.AnalogButton || binding.Type == InputType.GamepadAnalogButton)
 			{
 				binding.DeadZone = EditorGUILayout.FloatField(m_deadZoneInfo, binding.DeadZone);
 			}
 
-			if(binding.Type == InputType.DigitalAxis)
+            if(binding.Type == InputType.AnalogAxis || binding.Type == InputType.GamepadAxis)
+            {
+                binding.DeadZoneType = (DeadZoneType)EditorGUILayout.EnumPopup("Dead Zone Mode", binding.DeadZoneType);
+            }
+
+            if(binding.Type == InputType.DigitalAxis)
 				binding.Snap = EditorGUILayout.Toggle(m_snapInfo, binding.Snap);
 
 			if(binding.Type == InputType.DigitalAxis || binding.Type == InputType.AnalogAxis ||
@@ -1193,7 +1204,7 @@ namespace LuminosityEditor.IO
 		private void TryToFindInputManagerInScene()
 		{
 			m_inputManager = UnityObject.FindObjectOfType<InputManager>();
-			m_tryedToFindInputManagerInScene = true;
+			m_triedToFindInputManagerInScene = true;
 		}
 
 		private void HandlePlayModeChanged(PlayModeStateChange state)
@@ -1266,7 +1277,7 @@ namespace LuminosityEditor.IO
 				numberOfFields = 3;
 				break;
 			case InputType.DigitalAxis:
-				numberOfFields = 6;
+				numberOfFields = 7;
 				break;
 			case InputType.RemoteButton:
 				numberOfFields = 0;
@@ -1278,7 +1289,7 @@ namespace LuminosityEditor.IO
 				numberOfFields = 4;
 				break;
 			case InputType.AnalogAxis:
-				numberOfFields = 5;
+				numberOfFields = 7;
 				break;
 			case InputType.GamepadButton:
 				numberOfFields = 2;
@@ -1287,7 +1298,7 @@ namespace LuminosityEditor.IO
 				numberOfFields = 4;
 				break;
 			case InputType.GamepadAxis:
-				numberOfFields = 5;
+				numberOfFields = 7;
 				break;
 			}
 

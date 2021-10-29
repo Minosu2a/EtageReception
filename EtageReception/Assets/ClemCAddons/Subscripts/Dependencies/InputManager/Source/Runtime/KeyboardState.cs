@@ -20,42 +20,46 @@
 //	FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
 //	ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #endregion
+using UnityEngine;
 
 namespace Luminosity.IO
 {
-	public struct GamepadVibration
-	{
-		public float LeftMotor;
-		public float RightMotor;
-		public float LeftTrigger;
-		public float RightTrigger;
-
-        public static GamepadVibration None
+    public static class KeyboardState
+    {
+        public static bool AnyInput()
         {
-            get
-            {
-                return new GamepadVibration(0.0f, 0.0f, 0.0f, 0.0f);
-            }
+            KeyboardStateService service = InputManager.GetService<KeyboardStateService>();
+            return service != null ? service.AnyInput : false;
         }
 
-		public GamepadVibration(float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
-		{
-			LeftMotor = leftMotor;
-			RightMotor = rightMotor;
-			LeftTrigger = leftTrigger;
-			RightTrigger = rightTrigger;
-		}
-	}
+        public static bool GetKey(KeyCode key)
+        {
+            return Input.GetKey(key);
+        }
 
-	public interface IGamepadStateAdapter
-	{
-		bool IsConnected(GamepadIndex gamepad);
-		float GetAxis(GamepadAxis axis, GamepadIndex gamepad);
-		float GetAxisRaw(GamepadAxis axis, GamepadIndex gamepad);
-		bool GetButton(GamepadButton button, GamepadIndex gamepad);
-		bool GetButtonDown(GamepadButton button, GamepadIndex gamepad);
-		bool GetButtonUp(GamepadButton button, GamepadIndex gamepad);
-		void SetVibration(GamepadVibration vibration, GamepadIndex gamepad);
-		GamepadVibration GetVibration(GamepadIndex gamepad);
-	}
+        public static bool GetKeyDown(KeyCode key)
+        {
+            return Input.GetKeyDown(key);
+        }
+
+        public static bool GetKeyUp(KeyCode key)
+        {
+            return Input.GetKeyUp(key);
+        }
+
+        public static bool GetMouseButton(int index)
+        {
+            return Input.GetMouseButton(index);
+        }
+
+        public static bool GetMouseButtonDown(int index)
+        {
+            return Input.GetMouseButtonDown(index);
+        }
+
+        public static bool GetMouseButtonUp(int index)
+        {
+            return Input.GetMouseButtonUp(index);
+        }
+    }
 }
