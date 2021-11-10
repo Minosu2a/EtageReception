@@ -8,7 +8,7 @@ public class SplineDecoratorInspector : Editor
 	private SplineDecorator decorator;
 	
 	private BezierSpline spline;
-	private int frequency;
+	private int StepSize;
 
 
 
@@ -17,7 +17,7 @@ public class SplineDecoratorInspector : Editor
 		decorator = target as SplineDecorator;
 		var sd = new SerializedObject(decorator);
 		EditorGUILayout.PropertyField(sd.FindProperty("spline"), new GUIContent("Spline"));
-		EditorGUILayout.PropertyField(sd.FindProperty("frequency"), new GUIContent("Frequency"));
+		EditorGUILayout.PropertyField(sd.FindProperty("StepSize"), new GUIContent("Step Size"));
 		sd.ApplyModifiedProperties();
 		EditorGUI.BeginChangeCheck();
 		bool forward = EditorGUILayout.Toggle("Look Forward", decorator.lookForward);
@@ -29,23 +29,34 @@ public class SplineDecoratorInspector : Editor
 		}
 		EditorGUILayout.PropertyField(sd.FindProperty("items"), new GUIContent("Items"));
 		sd.ApplyModifiedProperties();
+		GUILayout.Label("Spawn");
 		EditorGUI.BeginChangeCheck();
-		bool spawn = EditorGUILayout.Toggle("Spawn on Play", decorator.spawnOnPlay);
+		bool spawn = EditorGUILayout.Toggle("On Play", decorator.spawnOnPlay);
+		if (EditorGUI.EndChangeCheck())
+		{
+			Undo.RecordObject(decorator, "On Play");
+			EditorUtility.SetDirty(decorator);
+			decorator.spawnOnPlay = spawn;
+		}
+		EditorGUI.BeginChangeCheck();
+		bool spawnn = EditorGUILayout.Toggle("Only Selected Curves", decorator.spawnSelectedOnly);
+		if (EditorGUI.EndChangeCheck())
+		{
+			Undo.RecordObject(decorator, "Only Selected Curves");
+			EditorUtility.SetDirty(decorator);
+			decorator.spawnSelectedOnly = spawnn;
+		}
 		if (GUILayout.Button("Spawn Now"))
 		{
 			decorator.SpawnNow();
 			EditorUtility.SetDirty(decorator);
 		}
+		EditorGUI.BeginChangeCheck();
 		if (GUILayout.Button("Clear"))
 		{
 			decorator.Clear();
 			EditorUtility.SetDirty(decorator);
 		}
-		if (EditorGUI.EndChangeCheck())
-		{
-			Undo.RecordObject(decorator, "Spawn on Play");
-			EditorUtility.SetDirty(decorator);
-			decorator.spawnOnPlay = spawn;
-		}
+		
 	}
 }
