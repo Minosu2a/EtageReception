@@ -13,28 +13,28 @@ namespace ClemCAddons
             #region SwitchCamera
             public static async void SwitchCamera(Camera originCamera, Camera destinationCamera, float speed, OnCompleted onCompleted)
             {
-                NodeBasedCamera t = originCamera.GetComponent<NodeBasedCamera>();
-                NodeBasedCamera res = destinationCamera.GetComponent<NodeBasedCamera>();
+                GameObject t = originCamera.gameObject;
+                GameObject res = destinationCamera.gameObject;
                 Vector3 originalPosition = originCamera.transform.position;
                 Quaternion originalRotation = originCamera.transform.rotation;
                 if (t != null)
                 {
-                    t.enabled = false;
+                    t.SetActive(false);
                 }
                 if (res != null)
                 {
-                    res.enabled = false;
+                    res.SetActive(false);
                 }
                 await GameTools.MoveTo(originCamera.transform, destinationCamera.transform.position, destinationCamera.transform.rotation, speed);
                 originCamera.transform.position = originalPosition;
                 originCamera.transform.rotation = originalRotation;
                 if (t != null)
                 {
-                    t.enabled = true;
+                    t.SetActive(true);
                 }
                 if (res != null)
                 {
-                    res.enabled = true;
+                    res.SetActive(true);
                 }
                 destinationCamera.enabled = true;
                 originCamera.enabled = false;
@@ -42,56 +42,56 @@ namespace ClemCAddons
             }
             public static async void SwitchCamera(Camera originCamera, Camera destinationCamera, float speed)
             {
-                NodeBasedCamera t = originCamera.GetComponent<NodeBasedCamera>();
-                NodeBasedCamera res = destinationCamera.GetComponent<NodeBasedCamera>();
+                GameObject t = originCamera.gameObject;
+                GameObject res = destinationCamera.gameObject;
                 Vector3 originalPosition = originCamera.transform.position;
                 Quaternion originalRotation = originCamera.transform.rotation;
                 if (t != null)
                 {
-                    t.enabled = false;
+                    t.SetActive(false);
                 }
                 if (res != null)
                 {
-                    res.enabled = false;
+                    res.SetActive(false);
                 }
                 await GameTools.MoveTo(originCamera.transform, destinationCamera.transform.position, destinationCamera.transform.rotation, speed);
                 originCamera.transform.position = originalPosition;
                 originCamera.transform.rotation = originalRotation;
                 if (t != null)
                 {
-                    t.enabled = true;
+                    t.SetActive(true);
                 }
                 if (res != null)
                 {
-                    res.enabled = true;
+                    res.SetActive(true);
                 }
                 destinationCamera.enabled = true;
                 originCamera.enabled = false;
             }
             public static async Task SwitchCameraAsync(Camera originCamera, Camera destinationCamera, float speed)
             {
-                NodeBasedCamera t = originCamera.GetComponent<NodeBasedCamera>();
-                NodeBasedCamera res = destinationCamera.GetComponent<NodeBasedCamera>();
+                GameObject t = originCamera.gameObject;
+                GameObject res = destinationCamera.gameObject;
                 Vector3 originalPosition = originCamera.transform.position;
                 Quaternion originalRotation = originCamera.transform.rotation;
                 if (t != null)
                 {
-                    t.enabled = false;
+                    t.SetActive(false);
                 }
                 if (res != null)
                 {
-                    res.enabled = false;
+                    res.SetActive(false);
                 }
                 await GameTools.MoveTo(originCamera.transform, destinationCamera.transform.position, destinationCamera.transform.rotation, speed);
                 originCamera.transform.position = originalPosition;
                 originCamera.transform.rotation = originalRotation;
                 if (t != null)
                 {
-                    t.enabled = true;
+                    t.SetActive(true);
                 }
                 if (res != null)
                 {
-                    res.enabled = true;
+                    res.SetActive(true);
                 }
                 destinationCamera.enabled = true;
                 originCamera.enabled = false;

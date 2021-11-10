@@ -32,6 +32,7 @@ public class BezierSplineInspector : Editor {
 		if (selectedIndex >= 0 && selectedIndex < spline.ControlPointCount) {
 			DrawSelectedPointInspector();
 		}
+		DrawAllCurvesInspector();
 		if (GUILayout.Button("Add Curve")) {
 			Undo.RecordObject(spline, "Add Curve");
 			spline.AddCurve();
@@ -43,6 +44,12 @@ public class BezierSplineInspector : Editor {
 			spline.RemoveCurve();
 			EditorUtility.SetDirty(spline);
 		}
+		//if (GUILayout.Button("Spawn Selected"))
+		//{
+		//	Undo.RecordObject(spline, "Spawn Selected");
+		//	spline.SpawnSelected(Curves);
+		//	EditorUtility.SetDirty(spline);
+		//}
 	}
 
 	private void DrawSelectedPointInspector() {
@@ -61,6 +68,14 @@ public class BezierSplineInspector : Editor {
 			spline.SetControlPointMode(selectedIndex, mode);
 			EditorUtility.SetDirty(spline);
 		}
+	}
+
+	private void DrawAllCurvesInspector()
+	{
+		var sd = new SerializedObject(spline);
+		EditorGUILayout.PropertyField(sd.FindProperty("curves"), new GUIContent("Curves"));
+		EditorGUI.BeginChangeCheck();
+		sd.ApplyModifiedProperties();
 	}
 
 	private void OnSceneGUI () {

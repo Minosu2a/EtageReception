@@ -53,9 +53,9 @@ namespace ClemCAddons
         {
             if (source.Length == 0)
                 return source;
-            for(int i = source.Length; i >= 0; i--)
+            for (int i = source.Length; i >= 0; i--)
             {
-                if(source[i].Equals(toRemove))
+                if (source[i].Equals(toRemove))
                 {
                     source = source.RemoveAt(i);
                 }
@@ -68,7 +68,7 @@ namespace ClemCAddons
         {
             T[] r = new T[source.Length];
             Array.Copy(source, r, source.Length);
-            Array.Resize(ref r, source.Length+1);
+            Array.Resize(ref r, source.Length + 1);
             r[source.Length] = value;
             return r;
         }
@@ -83,7 +83,7 @@ namespace ClemCAddons
         public static T[] AddValue<T>(this T[] source, T value)
         {
             dynamic result = source;
-            for(int i = 0; i < source.Length; i++)
+            for (int i = 0; i < source.Length; i++)
             {
                 result[i] = result[i] + value;
             }
@@ -120,7 +120,7 @@ namespace ClemCAddons
         #region Find
         public static int FindIndex<T>(this T[] source, T value)
         {
-            for(int i = 0; i < source.Length; i++)
+            for (int i = 0; i < source.Length; i++)
             {
                 if (source[i].Equals(value))
                 {
@@ -158,6 +158,14 @@ namespace ClemCAddons
             return new T[] { firstObject };
         }
         #endregion ToArray
+        #region SetAt
+        public static T[] SetAt<T>(this T[] source, T value, int index)
+        {
+            dynamic result = source;
+            result[index] = value;
+            return result;
+        }
+        #endregion SetAt
         #endregion ArrayAdditions
         #region CopyNode
         public static NodeContent Copy(NodeContent source)
@@ -215,6 +223,7 @@ namespace ClemCAddons
                     if (hits[i].distance > 0 && hits[i].collider.gameObject.CompareTag(tag) && (hits[i].distance < hit.distance || hit.distance == 0))
                     {
                         result = true;
+                        hit = hits[i];
                         hit.distance += 0.2f;
                     }
                 }
@@ -233,6 +242,46 @@ namespace ClemCAddons
             }
             if (debug)
             {
+                Debug.DrawLine(from, to, Color.grey);
+                EditorTools.DrawLineInEditor(from, to, Color.grey);
+                EditorTools.DrawSphereInEditor(result ? from + (ray.direction * hit.distance) : to, 0.05f, Color.grey);
+            }
+            return result;
+        }
+
+        public static bool CastTo(this Vector3 from, Vector3 to, LayerMask layer, string tag, out RaycastHit hit, bool debug = false)
+        {
+            Ray ray = new Ray(from, (to - from).normalized);
+            bool result = false;
+            hit = new RaycastHit();
+            var hits = Physics.SphereCastAll(ray, 0.2f, Vector3.Distance(from, to), layer);
+            if (hits.Length > 0)
+            {
+                for (int i = 0; i < hits.Length; i++)
+                {
+                    if (hits[i].distance > 0 && hits[i].collider.gameObject.CompareTag(tag) && (hits[i].distance < hit.distance || hit.distance == 0))
+                    {
+                        result = true;
+                        hit = hits[i];
+                        hit.distance += 0.2f;
+                    }
+                }
+            }
+            if (!result)
+            {
+                hits = Physics.RaycastAll(ray, Vector3.Distance(from, to), layer);
+                for (int i = 0; i < hits.Length; i++)
+                {
+                    if (hits[i].distance > 0 && hits[i].collider.gameObject.CompareTag(tag) && (hits[i].distance < hit.distance || hit.distance == 0))
+                    {
+                        result = true;
+                        hit = hits[i];
+                    }
+                }
+            }
+            if (debug)
+            {
+                Debug.DrawLine(from, to, Color.grey);
                 EditorTools.DrawLineInEditor(from, to, Color.grey);
                 EditorTools.DrawSphereInEditor(result ? from + (ray.direction * hit.distance) : to, 0.05f, Color.grey);
             }
@@ -271,6 +320,7 @@ namespace ClemCAddons
             }
             if (debug)
             {
+                Debug.DrawLine(from, to, Color.grey);
                 EditorTools.DrawLineInEditor(from, to, Color.grey);
                 EditorTools.DrawSphereInEditor(result ? from + (ray.direction * hit.distance) : to, 0.05f, Color.grey);
             }
@@ -309,6 +359,82 @@ namespace ClemCAddons
             }
             if (debug)
             {
+                Debug.DrawLine(from, to, Color.grey);
+                EditorTools.DrawLineInEditor(from, to, Color.grey);
+                EditorTools.DrawSphereInEditor(result ? from + (ray.direction * hit.distance) : to, 0.05f, Color.grey);
+            }
+            return result;
+        }
+        public static bool CastToLineOnly(this Vector3 from, Vector3 to, LayerMask layer, string tag, out RaycastHit hit, bool debug = false)
+        {
+            Ray ray = new Ray(from, (to - from).normalized);
+            bool result = false;
+            hit = new RaycastHit();
+            RaycastHit[] hits = Physics.RaycastAll(ray, Vector3.Distance(from, to), layer);
+            for (int i = 0; i < hits.Length; i++)
+            {
+                if (hits[i].distance > 0 && hits[i].collider.gameObject.CompareTag(tag) && (hits[i].distance < hit.distance || hit.distance == 0))
+                {
+                    result = true;
+                    hit = hits[i];
+                }
+            }
+            if (debug)
+            {
+                Debug.DrawLine(from, to, Color.grey);
+                EditorTools.DrawLineInEditor(from, to, Color.grey);
+                EditorTools.DrawSphereInEditor(result ? from + (ray.direction * hit.distance) : to, 0.05f, Color.grey);
+            }
+            return result;
+        }
+        public static bool CastToSphereOnly(this Vector3 from, Vector3 to, LayerMask layer, string tag, float radius, bool debug = false)
+        {
+            Ray ray = new Ray(from, (to - from).normalized);
+            bool result = false;
+            RaycastHit hit = new RaycastHit();
+            var hits = Physics.SphereCastAll(ray, radius, Vector3.Distance(from, to), layer);
+            if (hits.Length > 0)
+            {
+                for (int i = 0; i < hits.Length; i++)
+                {
+                    if (hits[i].distance > 0 && hits[i].collider.gameObject.CompareTag(tag) && (hits[i].distance < hit.distance || hit.distance == 0))
+                    {
+                        result = true;
+                        hit = hits[i];
+                        hit.distance += radius;
+                    }
+                }
+            }
+            if (debug)
+            {
+                Debug.DrawLine(from, to, Color.grey);
+                EditorTools.DrawLineInEditor(from, to, Color.grey);
+                EditorTools.DrawSphereInEditor(result ? from + (ray.direction * hit.distance) : to, 0.05f, Color.grey);
+            }
+            return result;
+        }
+
+        public static bool CastToSphereOnly(this Vector3 from, Vector3 to, LayerMask layer, string tag, float radius, out RaycastHit hit, bool debug = false)
+        {
+            Ray ray = new Ray(from, (to - from).normalized);
+            bool result = false;
+            hit = new RaycastHit();
+            var hits = Physics.SphereCastAll(ray, radius, Vector3.Distance(from, to), layer);
+            if (hits.Length > 0)
+            {
+                for (int i = 0; i < hits.Length; i++)
+                {
+                    if (hits[i].distance > 0 && hits[i].collider.gameObject.CompareTag(tag) && (hits[i].distance < hit.distance || hit.distance == 0))
+                    {
+                        result = true;
+                        hit = hits[i];
+                        hit.distance += radius;
+                    }
+                }
+            }
+            if (debug)
+            {
+                Debug.DrawLine(from, to, Color.grey);
                 EditorTools.DrawLineInEditor(from, to, Color.grey);
                 EditorTools.DrawSphereInEditor(result ? from + (ray.direction * hit.distance) : to, 0.05f, Color.grey);
             }
@@ -353,6 +479,7 @@ namespace ClemCAddons
             }
             return result;
         }
+
         #endregion Casts
         #region Texture Additions
         public static Texture2D Update(this Texture2D texture, Vector2Int pos, Vector2Int size, Color32[] pixels, bool drawOver = true, bool apply = false)
@@ -445,11 +572,17 @@ namespace ClemCAddons
 
         #endregion Color Additions
         #region Vector3 Additions
-        #region Direction
+        #region Validation
         public static bool IsZero(this Vector3 vector)
         {
-            return vector == new Vector3();
+            return vector.Equals(Vector3.zero);
         }
+        public static bool IsInfinite(this Vector3 vector)
+        {
+            return vector.Equals(Vector3.positiveInfinity) || vector.Equals(Vector3.negativeInfinity);
+        }
+        #endregion Validation
+        #region Direction
         public static Vector3 Remap(this Vector3 vector, Vector3 direction)
         {
             return (direction.Right() * vector.x)
@@ -494,7 +627,7 @@ namespace ClemCAddons
         }
         public static Vector3 Direction(this Vector3 from, Vector3 to, bool inverse)
         {
-            return inverse? (from-to).normalized : (to - from).normalized;
+            return inverse ? (from - to).normalized : (to - from).normalized;
         }
         public static Quaternion ToQuaternion(this Vector3 euler)
         {
@@ -503,6 +636,14 @@ namespace ClemCAddons
         public static Quaternion ToQuaternion(this Vector3 NormalizedVector, Quaternion rotation)
         {
             return Quaternion.FromToRotation(Vector3.up, NormalizedVector) * rotation;
+        }
+        public static Vector3 Reflect(this Vector3 vector, Vector3 normal)
+        {
+            return vector - 2 * Vector3.Dot(vector, normal) * normal;
+        }
+        public static Vector3 Movealong(this Vector3 vector, Vector3 normal)
+        {
+            return vector - Vector3.Dot(vector, normal) * normal;
         }
         #endregion Direction
         #region Min Max
@@ -671,7 +812,7 @@ namespace ClemCAddons
         }
         public static Vector3 Randomize(this Vector3 vector, bool x, bool y, bool z)
         {
-            return new Vector3(x ? UnityEngine.Random.value: vector.x, y ? UnityEngine.Random.value : vector.y, z ? UnityEngine.Random.value : vector.z);
+            return new Vector3(x ? UnityEngine.Random.value : vector.x, y ? UnityEngine.Random.value : vector.y, z ? UnityEngine.Random.value : vector.z);
         }
         public static Vector3 Randomize(this Vector3 vector, float maxPercDiff)
         {
@@ -692,6 +833,16 @@ namespace ClemCAddons
 
         #endregion Vector3 Additions
         #region Vector2 Additions
+        #region Direction
+        public static Vector2 Reflect(this Vector2 vector, Vector2 normal)
+        {
+            return vector - 2 * Vector2.Dot(vector, normal) * normal;
+        }
+        public static Vector2 Movealong(this Vector2 vector, Vector2 normal)
+        {
+            return vector - Vector2.Dot(vector, normal) * normal;
+        }
+        #endregion Direction
         #region isBetween
         public static bool IsBetween(this Vector2 vector, Vector2 bound1, Vector2 bound2)
         {
@@ -711,12 +862,12 @@ namespace ClemCAddons
         }
         public static Vector2 SetX(this Vector2 vector, double x)
         {
-            vector.x = (float) x;
+            vector.x = (float)x;
             return vector;
         }
         public static Vector2 SetY(this Vector2 vector, double y)
         {
-            vector.y = (float) y;
+            vector.y = (float)y;
             return vector;
         }
         #endregion Set Partial
@@ -822,7 +973,7 @@ namespace ClemCAddons
         }
         public static float Minus(this float f, float value, bool maxFirst = false)
         {
-            return Mathf.Max(f,value) - Mathf.Min(f, value);
+            return Mathf.Max(f, value) - Mathf.Min(f, value);
         }
         public static float MinusAngle(this float f, float value)
         {
@@ -916,9 +1067,9 @@ namespace ClemCAddons
         public static Transform FindDeep(this Transform transform, string name)
         {
             Transform[] res = transform.GetComponentsInChildren<Transform>(true);
-            foreach(Transform r in res)
+            foreach (Transform r in res)
             {
-                if(r.name == name)
+                if (r.name == name)
                 {
                     return r;
                 }
@@ -930,12 +1081,55 @@ namespace ClemCAddons
             var r = gameObject.transform.FindDeep(name);
             return r == null ? null : r.gameObject;
         }
-        public static Transform GetParent(this Transform transform, int i)
+        public static Transform GetParent(this Transform transform, int num)
         {
-            if (i == 1)
-                return transform.parent;
-            else
-                return transform.parent.GetParent(i - 1);
+            if (num == 0)
+                return transform;
+            return transform.parent.GetParent(num - 1);
+        }
+        public static Transform FindParentDeep(this Transform transform, string name)
+        {
+            if (transform == null)
+                return null;
+            Transform res = transform.parent;
+            if (res.name == name)
+            {
+                return res;
+            }
+            return FindParentDeep(res, name);
+        }
+        public static GameObject FindParentDeep(this GameObject gameObject, string name)
+        {
+            var r = gameObject.transform.FindParentDeep(name);
+            return r == null ? null : r.gameObject;
+        }
+        public static Transform[] GetChildsWithComponent(this Transform transform, Type type)
+        {
+            Transform[] r = new Transform[] { };
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                if (transform.GetChild(i).TryGetComponent(type, out _))
+                {
+                    r.Add(transform.GetChild(i));
+                }
+            }
+            return r;
+        }
+        public static Transform FindParentWithComponent(this Transform transform, Type type)
+        {
+            if (transform == null)
+                return null;
+            Transform res = transform.parent;
+            if (res.TryGetComponent(type, out _))
+            {
+                return res;
+            }
+            return FindParentWithComponent(res, type);
+        }
+        public static GameObject FindParentWithComponent(this GameObject gameObject, Type type)
+        {
+            var r = gameObject.transform.FindParentWithComponent(type);
+            return r == null ? null : r.gameObject;
         }
         #endregion Transform Additions
         #region Distances
@@ -1159,6 +1353,14 @@ namespace ClemCAddons
             {
                 return inverse ? (from - to).normalized : (to - from).normalized;
             }
+            public static Vector3 Reflect(Vector3 vector, Vector3 normal)
+            {
+                return vector - 2 * Vector3.Dot(vector, normal) * normal;
+            }
+            public static Vector3 Movealong(Vector3 vector, Vector3 normal)
+            {
+                return vector - Vector3.Dot(vector, normal) * normal;
+            }
             #endregion Direction
             #region Random
             public static Vector3 RandomVector()
@@ -1194,6 +1396,16 @@ namespace ClemCAddons
             }
             #endregion Random
             #endregion Vector3 Additions
+            #region Vector2 Additions
+            public static Vector2 Reflect(Vector2 vector, Vector2 normal)
+            {
+                return vector - 2 * Vector2.Dot(vector, normal) * normal;
+            }
+            public static Vector2 Movealong(Vector2 vector, Vector2 normal)
+            {
+                return vector - Vector2.Dot(vector, normal) * normal;
+            }
+            #endregion Vector2 Additions
             #region Ground & Wall
             public static float FindGround(Vector3 position, float sizeCompensation, float maxDistance, LayerMask layer)
             {
@@ -1355,7 +1567,42 @@ namespace ClemCAddons
                 }
                 return result;
             }
-
+            public static bool CastTo(Vector3 from, Vector3 to, LayerMask layer, bool debug = false)
+            {
+                Ray ray = new Ray(from, (to - from).normalized);
+                bool result = false;
+                RaycastHit hit = new RaycastHit();
+                var hits = Physics.SphereCastAll(ray, 0.2f, Vector3.Distance(from, to), layer);
+                if (hits.Length > 0)
+                {
+                    for (int i = 0; i < hits.Length; i++)
+                    {
+                        if (hits[i].distance > 0 && (hits[i].distance < hit.distance || hit.distance == 0))
+                        {
+                            result = true;
+                            hit.distance += 0.2f;
+                        }
+                    }
+                }
+                if (!result)
+                {
+                    hits = Physics.RaycastAll(ray, Vector3.Distance(from, to), layer);
+                    for (int i = 0; i < hits.Length; i++)
+                    {
+                        if (hits[i].distance > 0 && (hits[i].distance < hit.distance || hit.distance == 0))
+                        {
+                            result = true;
+                            hit = hits[i];
+                        }
+                    }
+                }
+                if (debug)
+                {
+                    EditorTools.DrawLineInEditor(from, to, Color.grey);
+                    EditorTools.DrawSphereInEditor(result ? from + (ray.direction * hit.distance) : to, 0.05f, Color.grey);
+                }
+                return result;
+            }
             public static bool CastTo(Vector3 from, Vector3 to, LayerMask layer, string tag, float radius, bool debug = false)
             {
                 Ray ray = new Ray(from, (to - from).normalized);
@@ -1431,6 +1678,80 @@ namespace ClemCAddons
                 }
                 return result;
             }
+            public static bool CastTo(Vector3 from, Vector3 to, LayerMask layer, float radius, out RaycastHit hit, bool debug = false)
+            {
+                Ray ray = new Ray(from, (to - from).normalized);
+                bool result = false;
+                hit = new RaycastHit();
+                var hits = Physics.SphereCastAll(ray, radius, Vector3.Distance(from, to), layer);
+                if (hits.Length > 0)
+                {
+                    for (int i = 0; i < hits.Length; i++)
+                    {
+                        if (hits[i].distance > 0 && (hits[i].distance < hit.distance || hit.distance == 0))
+                        {
+                            result = true;
+                            hit = hits[i];
+                            hit.distance += radius;
+                        }
+                    }
+                }
+                if (!result)
+                {
+                    hits = Physics.RaycastAll(ray, Vector3.Distance(from, to), layer);
+                    for (int i = 0; i < hits.Length; i++)
+                    {
+                        if (hits[i].distance > 0 && (hits[i].distance < hit.distance || hit.distance == 0))
+                        {
+                            result = true;
+                            hit = hits[i];
+                        }
+                    }
+                }
+                if (debug)
+                {
+                    EditorTools.DrawLineInEditor(from, to, Color.grey);
+                    EditorTools.DrawSphereInEditor(result ? from + (ray.direction * hit.distance) : to, 0.05f, Color.grey);
+                }
+                return result;
+            }
+            public static bool CastTo2D(Vector2 from, Vector2 to, LayerMask layer, float radius, out RaycastHit2D hit, bool debug = false)
+            {
+                Vector2 dir = (to - from).normalized;
+                bool result = false;
+                hit = new RaycastHit2D();
+                var hits = Physics2D.CircleCastAll(from, radius, dir, Vector3.Distance(from, to), layer);
+                if (hits.Length > 0)
+                {
+                    for (int i = 0; i < hits.Length; i++)
+                    {
+                        if (hits[i].distance > 0 && (hits[i].distance < hit.distance || hit.distance == 0))
+                        {
+                            result = true;
+                            hit = hits[i];
+                            hit.distance += radius;
+                        }
+                    }
+                }
+                if (!result)
+                {
+                    hits = Physics2D.RaycastAll(from, dir, Vector2.Distance(from, to), layer);
+                    for (int i = 0; i < hits.Length; i++)
+                    {
+                        if (hits[i].distance > 0 && (hits[i].distance < hit.distance || hit.distance == 0))
+                        {
+                            result = true;
+                            hit = hits[i];
+                        }
+                    }
+                }
+                if (debug)
+                {
+                    EditorTools.DrawLineInEditor(from, to, Color.grey);
+                    EditorTools.DrawSphereInEditor(result ? from + (dir * hit.distance) : to, 0.05f, Color.grey);
+                }
+                return result;
+            }
             #endregion Casts
             #region Async
             public static async Task MoveTo(Transform transform, Vector3 destination, float speed = 1f)
@@ -1459,7 +1780,7 @@ namespace ClemCAddons
             }
             public static async Task MoveTo(Transform transform, Vector3[] points, float speed = 1f)
             {
-                for(int i = 0; i < points.Length; i++)
+                for (int i = 0; i < points.Length; i++)
                 {
                     await MoveTo(transform, points[i], speed);
                 }
@@ -1511,6 +1832,8 @@ namespace ClemCAddons
                     await Task.Delay(delay);
                     if (stopwatch.IsRunning)
                     {
+                        stopwatch.Stop();
+                        timers.Remove(timers.Find(t => t.Value == stopwatch));
                         callback.Invoke();
                         if (!loop)
                         {
@@ -1534,7 +1857,7 @@ namespace ClemCAddons
             public static void EndTimer(int id)
             {
                 var r = timers.Find(t => t.Key == id);
-                if(!r.Equals(default(KeyValuePair<int, Stopwatch>)))
+                if (!r.Equals(default(KeyValuePair<int, Stopwatch>)))
                     r.Value.Stop();
                 timers.RemoveAll(t => t.Key == id);
             }
@@ -1565,7 +1888,7 @@ namespace ClemCAddons
             public double Speed { get => _speed; set => _speed = value; }
             public double Deceleration { get => _deceleration; set => _deceleration = value; }
             public double Deformation { get => _deformation; set => _deformation = value; }
-            public double CurrentSpeed { get => _currentSpeed;}
+            public double CurrentSpeed { get => _currentSpeed; }
 
             public double TilesPerScreen
             {
@@ -1601,7 +1924,7 @@ namespace ClemCAddons
             }
             public int GetCurrentItem()
             {
-                return (int)Math.Round((_tilesCount-1) * _currentValue);
+                return (int)Math.Round((_tilesCount - 1) * _currentValue);
             }
             public double GetSlide()
             {
@@ -1618,7 +1941,7 @@ namespace ClemCAddons
             public double[] GetTileSizes()
             {
                 KeyValuePair<int, double>[] res = new KeyValuePair<int, double>[_tilesCount];
-                if(res.Length > 1)
+                if (res.Length > 1)
                 {
                     for (int i = 0; i < res.Length; i++)
                     {
@@ -1632,7 +1955,8 @@ namespace ClemCAddons
                     }
                     result = result.OrderBy(t => t.Key).ToArray();
                     return result.Select(t => t.Value).ToArray();
-                } else
+                }
+                else
                 {
                     return _tileSize.MakeArray();
                 }
@@ -1651,11 +1975,12 @@ namespace ClemCAddons
                         _currentValue = _scrollBar.horizontalNormalizedPosition;
                     }
                 }
-                _currentValue = Math.Max(0, Math.Min(1,_currentValue + (_currentSpeed * Time.smoothDeltaTime)));
-                if(_currentSpeed > 0)
+                _currentValue = Math.Max(0, Math.Min(1, _currentValue + (_currentSpeed * Time.smoothDeltaTime)));
+                if (_currentSpeed > 0)
                 {
                     _currentSpeed = Math.Max(0, _currentSpeed - (_deceleration * Time.smoothDeltaTime));
-                } else
+                }
+                else
                 {
                     _currentSpeed = Math.Min(0, _currentSpeed + (_deceleration * Time.smoothDeltaTime));
                 }
@@ -1669,27 +1994,27 @@ namespace ClemCAddons
             #region Drawers
             public static void DrawLineInEditor(Vector3 from, Vector3 to, Color color)
             {
-    #if (UNITY_EDITOR)
+#if (UNITY_EDITOR)
                 if (!Application.isPlaying)
                 {
                     Gizmos.color = color;
                     Gizmos.DrawLine(from, to);
                 }
-    #endif
+#endif
             }
             public static void DrawSphereInEditor(Vector3 position, float radius, Color color)
             {
-    #if (UNITY_EDITOR)
+#if (UNITY_EDITOR)
                 if (!Application.isPlaying)
                 {
                     Gizmos.color = color;
                     Gizmos.DrawSphere(position, radius);
                 }
-    #endif
+#endif
             }
             public static void DrawCubeInEditor(Vector3 position, Vector3 dimensions, Color color)
             {
-    #if (UNITY_EDITOR)
+#if (UNITY_EDITOR)
                 if (!Application.isPlaying)
                 {
                     Gizmos.color = color;

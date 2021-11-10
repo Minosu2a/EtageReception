@@ -14,14 +14,21 @@ namespace ClemCAddons
     {
         public class TPSCameraWithNodeSupport : MonoBehaviour
         {
+            [Header("Inputs")]
             [SerializeField] private string _horizontalMovement = "LookHorizontal";
             [SerializeField] private string _verticalMovement = "LookVertical";
             [SerializeField] private int _inputSensitivity = 200;
+            [Header("Settings")]
             [SerializeField] private float _distance = 2;
             [SerializeField] private float _linearSmoothing = 0.2f;
             [SerializeField] private float _nodePercSmoothing = 0.2f;
             [SerializeField] private float _nodeFixedTolerance = 0.5f;
             [SerializeField] private float _playerMovementSpring = 0.02f;
+            [Header("Camera boom")]
+            [SerializeField] private string _cameraHitTag = "Hittable";
+            [SerializeField] private float _cameraBoomSmoothing = 0.05f;
+            [SerializeField] private float _obstacleMinimumDistance = 0.1f;
+
             private CharacterMovement _player = null;
             private float _defaultDistance;
             private Vector3 _position = Vector3.forward;
@@ -33,6 +40,7 @@ namespace ClemCAddons
             private Vector3 _previousChange = Vector3.zero;
             private Vector3 _previousPosition = Vector3.zero;
             private Vector3 _cheatOffsetTurned = Vector3.forward;
+            private float _cameraBoomD = 0f;
 
 
             void Start()
@@ -47,17 +55,29 @@ namespace ClemCAddons
             {
                 CamTriangulation(_player.transform);
                 GetInputs();
+                var change = (_position * _distance) + _offSetTurned + _cheatOffsetTurned;
                 if (_linearSmoothing != 0)
                 { // lerp around the player, but moves with the player as point of reference
-                    var change = (_position * _distance) + _offSetTurned + _cheatOffsetTurned;
                     var position = Vector3.Lerp(_previousPosition, _player.transform.position, Time.smoothDeltaTime / _playerMovementSpring);
-                    transform.position = position + Vector3.Lerp(_previousChange, change, Time.smoothDeltaTime / _linearSmoothing);
+                    var objective = position + change;
+                    bool t = _player.transform.position.CastToSphereOnly(objective, _player.CollisionLayer, _cameraHitTag, _obstacleMinimumDistance, out RaycastHit hit);
+                    if (t)
+                        _cameraBoomD = Mathf.Lerp(_cameraBoomD, hit.distance, Time.smoothDeltaTime / _cameraBoomSmoothing);
+                    else
+                        _cameraBoomD = Mathf.Lerp(_cameraBoomD, _distance, Time.smoothDeltaTime / _cameraBoomSmoothing);
+                    change = (_position * _cameraBoomD) + _offSetTurned + _cheatOffsetTurned;
+                    transform.position = position + change;
                     _previousChange = change;
                     _previousPosition = position;
                 }
                 else
                 {
-                    transform.position = _player.transform.position + (_position *_distance) + _offSetTurned + _cheatOffsetTurned;
+                    var objective = _player.transform.position + change;
+                    bool t = _player.transform.position.CastToSphereOnly(objective, _player.CollisionLayer, _cameraHitTag, _obstacleMinimumDistance, out RaycastHit hit);
+                    if (t)
+                        transform.position = hit.point;
+                    else
+                        transform.position = objective;
                 }
                 transform.LookAt(_player.transform.position + _offSetTurned);
             }
