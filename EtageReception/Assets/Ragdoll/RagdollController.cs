@@ -213,11 +213,11 @@ public class RagdollController : MonoBehaviour
                     float yrot = _objectGrabbed.transform.rotation.y;
                     float zrot = _objectGrabbed.transform.rotation.z;
 
-                    Quaternion dir = Quaternion.FromToRotation(_objectGrabbed.transform.position, _centerGrabPoint.transform.position);
-                    Quaternion rot = _centerGrabPoint.transform.rotation;
+                    //QUEL BORDEL ENVIE DE ME BATTRE LA
+                    // WHY DOESNT IT WANT TO TURN FFS!
+                    //WHY DOES APPLYING THE ROTATION NOT TURN A GLOBAL ROTATION TO A LOCAL ROTATION
 
-                    fj.anchor = (dir * rot).eulerAngles.normalized;
-
+                    fj.anchor = Vector3.forward;
                     _isGrabbing = true;
                 }
             }

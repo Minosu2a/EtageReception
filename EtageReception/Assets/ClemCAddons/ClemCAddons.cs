@@ -629,6 +629,14 @@ namespace ClemCAddons
         {
             return inverse ? (from - to).normalized : (to - from).normalized;
         }
+        public static Quaternion FullDirection(this Vector3 from, Vector3 to)
+        {
+            Quaternion q;
+            var a = Vector3.Dot(from, to);
+            q.x = q.y = q.z = a;
+            q.w = Mathf.Sqrt(from.sqrMagnitude * to.sqrMagnitude) + Vector3.Dot(from, to);
+            return q.normalized;
+        }
         public static Quaternion FullToQuaternion(this Vector3 vector)
         {
             var angle = Math.Atan2(vector.z, vector.x); // Note: I expected atan2(z,x) but OP reported success with atan2(x,z) instead! Switch around if you see 90° off.
