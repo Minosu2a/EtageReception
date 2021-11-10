@@ -1081,6 +1081,12 @@ namespace ClemCAddons
             var r = gameObject.transform.FindDeep(name);
             return r == null ? null : r.gameObject;
         }
+        public static Transform GetParent(this Transform transform, int num)
+        {
+            if (num == 0)
+                return transform;
+            return transform.parent.GetParent(num - 1);
+        }
         public static Transform FindParentDeep(this Transform transform, string name)
         {
             if (transform == null)
