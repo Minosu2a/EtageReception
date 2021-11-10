@@ -10097,7 +10097,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 648338002}
   m_LocalRotation: {x: 0.32820717, y: 0, z: 0, w: 0.94460577}
-  m_LocalPosition: {x: 25, y: 22, z: -100}
+  m_LocalPosition: {x: 25, y: 4.4, z: -113.8}
   m_LocalScale: {x: 1.3333335, y: 1.5774043, z: 1.3559291}
   m_Children: []
   m_Father: {fileID: 0}
@@ -10127,7 +10127,8 @@ MonoBehaviour:
   _rotationLeft: {x: 0.17216259, y: 0.12854321, z: -0.022665637, w: 0.9763826}
   _movementSmoothValue: 0.2
   _rotationSmoothValue: 0.2
-  _zoom: 5
+  _zoomFront: 5
+  _zoomBack: 8
 --- !u!43 &664311334
 Mesh:
   m_ObjectHideFlags: 0

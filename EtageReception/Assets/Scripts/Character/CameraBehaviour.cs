@@ -31,14 +31,16 @@ public class CameraBehaviour : MonoBehaviour
     [SerializeField] private Quaternion _rotationLeft = Quaternion.identity;
 
     [Header("Smooth")]
-    [SerializeField] float _movementSmoothValue = 0.2f;
-    [SerializeField] float _rotationSmoothValue = 0.2f;
+    [SerializeField] private float _movementSmoothValue = 0.2f;
+    [SerializeField] private float _rotationSmoothValue = 0.2f;
 
-    [Header("Smooth")]
-    [SerializeField] float _zoom = 5f;
+    [Header("Zoom")]
+    [SerializeField] private float _zoomFront = 5f;
+    [SerializeField] private float _zoomBack = 8f;
+
     void Start()
     {
-        
+
     }
 
     void Update()
@@ -55,8 +57,11 @@ public class CameraBehaviour : MonoBehaviour
         float XPosToUpdate = Mathf.Lerp(_maximumX.position.x, _minimumX.position.x, XPlayerPos);
 
 
+        float YPlayerPos = Mathf.Lerp(_zoomFront, _zoomBack, XPlayerPos);
 
-        Vector3 objPos = new Vector3(XPosToUpdate, transform.position.y, ZPosToUpdate);
+        Debug.Log(YPlayerPos);
+
+        Vector3 objPos = new Vector3(XPosToUpdate, YPlayerPos, ZPosToUpdate);
         transform.position = Vector3.Lerp(transform.position, objPos, Time.smoothDeltaTime / _movementSmoothValue);
 
 
