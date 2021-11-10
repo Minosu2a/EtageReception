@@ -34,7 +34,8 @@ public class CameraBehaviour : MonoBehaviour
     [SerializeField] float _movementSmoothValue = 0.2f;
     [SerializeField] float _rotationSmoothValue = 0.2f;
 
-
+    [Header("Smooth")]
+    [SerializeField] float _zoom = 5f;
     void Start()
     {
         
