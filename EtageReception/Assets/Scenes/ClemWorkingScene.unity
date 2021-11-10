@@ -758,10 +758,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 223608673}
-    - target: {fileID: 489276529, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
-      propertyPath: m_PlayAutomatically
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 583102854, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -794,30 +790,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1286365870}
-    - target: {fileID: 944806408, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
-      propertyPath: m_PlayAutomatically
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1079330716, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
-      propertyPath: m_PlayAutomatically
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1307117115, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
-      propertyPath: m_Animation
-      value: 
-      objectReference: {fileID: 7400000, guid: d01d0df4827ab9a439b193028930d086, type: 2}
-    - target: {fileID: 1307117115, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
-      propertyPath: m_PlayAutomatically
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1307117115, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
-      propertyPath: m_Animations.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1307117115, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
-      propertyPath: m_Animations.Array.data[0]
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 1362669890, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -826,10 +798,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1170130375}
-    - target: {fileID: 1439013847, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
-      propertyPath: m_PlayAutomatically
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1662429305, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
       propertyPath: m_Mesh
       value: 
