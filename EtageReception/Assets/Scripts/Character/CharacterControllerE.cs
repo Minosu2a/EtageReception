@@ -44,7 +44,7 @@ public class CharacterControllerE : MonoBehaviour
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
-        CharacterManager.Instance.CharacterController = this;    
+        //CharacterManager.Instance.CharacterController = this;    
     }
 
     private void Update()

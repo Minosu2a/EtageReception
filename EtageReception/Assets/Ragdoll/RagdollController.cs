@@ -5,6 +5,7 @@ using System.Linq;
 using ClemCAddons.Utilities;
 using System;
 using ClemCAddons;
+using Luminosity.IO;
 
 public class RagdollController : MonoBehaviour
 {
@@ -14,11 +15,22 @@ public class RagdollController : MonoBehaviour
     private Animator _animator;
     private List<GameObject> joints = new List<GameObject>();
     private List<KeyValuePair<int, KeyValuePair<float, AnimationInfo.InfoAnimation>>> _currentAnimations = new List<KeyValuePair<int, KeyValuePair<float, AnimationInfo.InfoAnimation>>>();
-
     private bool isRunningAnimation = true;
+
+    [Header("Grab")]
+    private bool _isGrabbing = false;
+
+    [SerializeField] private GrabDetection _grabDetection = null;
+    [SerializeField] private GameObject _centerGrabPoint = null;
+
+    private GameObject _objectGrabbed = null;
+
+    [SerializeField] private Rigidbody _trompeRigidbody = null;
+
 
     void Start()
     {
+        CharacterManager.Instance.CharacterController = this;
         var r = FindObjectsOfType<CopyMotion>();
         joints = r.Select(t => t.gameObject).ToList();
         _animator = transform.FindDeep("AnimationBody").GetComponent<Animator>();
@@ -27,41 +39,43 @@ public class RagdollController : MonoBehaviour
     void Update()
     {
         bool input = false;
-        if (Input.GetKey(KeyCode.W))
+        if (InputManager.GetAxis("Forward") > 0)
         {
             input = true;
             AddForceOnJoint("Root",transform.right * _speed * Time.deltaTime * 1000);
             AddForceOnJoint("LeftLeg", transform.right * _speed * Time.deltaTime * 1000);
             AddForceOnJoint("RightLeg", transform.right * _speed * Time.deltaTime * 1000);
-        }
-        if (Input.GetKey(KeyCode.S))
+        } else if (InputManager.GetAxis("Forward") < 0)
         {
             input = true;
             AddForceOnJoint("Root", transform.right * _speed * Time.deltaTime * -1000);
             AddForceOnJoint("LeftLeg", transform.right * _speed * Time.deltaTime * -1000);
             AddForceOnJoint("RightLeg", transform.right * _speed * Time.deltaTime * -1000);
         }
-        if (Input.GetKey(KeyCode.A))
+        if (InputManager.GetAxis("Strafe") > 0)
         {
             input = true;
             AddForceOnJoint("Root", transform.forward * _speed * Time.deltaTime * 1000);
             AddForceOnJoint("LeftLeg", transform.forward * _speed * Time.deltaTime * 1000);
             AddForceOnJoint("RightLeg", transform.forward * _speed * Time.deltaTime * 1000);
-        }
-        if (Input.GetKey(KeyCode.D))
+        } else if (InputManager.GetAxis("Strafe") < 0)
         {
             input = true;
             AddForceOnJoint("Root", transform.forward * _speed * Time.deltaTime * -1000);
             AddForceOnJoint("LeftLeg", transform.forward * _speed * Time.deltaTime * -1000);
             AddForceOnJoint("RightLeg", transform.forward * _speed * Time.deltaTime * -1000);
         }
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (InputManager.GetButtonDown("Jump"))
         {
             AddForceOnJoint("Root", transform.up * _jumpStrength * 1000);
             AddForceOnJoint("LeftArm", transform.up * _jumpStrength * 1000);
             AddForceOnJoint("RightArm", transform.up * _jumpStrength * 1000);
         }
-        if(!isRunningAnimation && input)
+        if (InputManager.GetButtonDown("Grab"))
+        {
+            Grab();
+        }
+        if (!isRunningAnimation && input)
         {
             var random = new System.Random();
             var t = random.Next(10);
@@ -75,7 +89,7 @@ public class RagdollController : MonoBehaviour
             isRunningAnimation = false;
         }
     }
-
+    #region Animation
     public void PlayAnimationByName(string name)
     {
         // standard behavior will ignore the second condition if the first is false, avoiding running into a potential error
@@ -129,6 +143,9 @@ public class RagdollController : MonoBehaviour
     {
         joint.enabled = false;
     }
+    #endregion Animation
+
+    #region Joints
 
     public void AddForceOnJoint(string joint, Vector3 force)
     {
@@ -142,4 +159,79 @@ public class RagdollController : MonoBehaviour
     {
         joint.gameObject.GetComponent<Rigidbody>().AddForce(force);
     }
+    #endregion Joints
+    #region Grab
+    public GameObject DetectObject()
+    {
+        if (_grabDetection.GrabRangeObject.Count > 0)
+        {
+            float smallerDistance = 0;
+            int integerOfCloserObject = 0;
+
+            for (int i = 0; i < _grabDetection.GrabRangeObject.Count; i++)
+            {
+
+                float dist = Vector3.Distance(_grabDetection.GrabRangeObject[i].transform.position, _centerGrabPoint.transform.position);
+
+                if (i == 0)
+                {
+                    smallerDistance = dist;
+                    integerOfCloserObject = i;
+                }
+                else if (dist < smallerDistance)
+                {
+                    smallerDistance = dist;
+                    integerOfCloserObject = i;
+                }
+            }
+
+            GameObject closestObject = _grabDetection.GrabRangeObject[integerOfCloserObject];
+            return closestObject;
+
+        }
+
+        return null;
+    }
+
+    public void Grab()
+    {
+        if (_isGrabbing == false)
+        {
+            if ((_objectGrabbed = DetectObject()) != null)
+            {
+                if (_objectGrabbed.GetComponent<ConfigurableJoint>() != null)
+                {
+                    ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
+
+                    fj.connectedBody = _trompeRigidbody;
+
+                    fj.xMotion = ConfigurableJointMotion.Locked;
+                    fj.yMotion = ConfigurableJointMotion.Locked;
+                    fj.zMotion = ConfigurableJointMotion.Locked;
+
+                    float xrot = _objectGrabbed.transform.rotation.x;
+                    float yrot = _objectGrabbed.transform.rotation.y;
+                    float zrot = _objectGrabbed.transform.rotation.z;
+
+                    Quaternion dir = Quaternion.FromToRotation(_objectGrabbed.transform.position, _centerGrabPoint.transform.position);
+                    Quaternion rot = _centerGrabPoint.transform.rotation;
+
+                    fj.anchor = (dir * rot).eulerAngles.normalized;
+
+                    _isGrabbing = true;
+                }
+            }
+        }
+        else if (_isGrabbing == true)
+        {
+            ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
+            fj.connectedBody = null;
+            fj.xMotion = ConfigurableJointMotion.Free;
+            fj.yMotion = ConfigurableJointMotion.Free;
+            fj.zMotion = ConfigurableJointMotion.Free;
+            _isGrabbing = false;
+        }
+
+    }
+#endregion Grab
 }

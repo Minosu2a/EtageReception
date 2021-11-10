@@ -8,8 +8,8 @@ public enum EGameState
     GAME,
     BATTLE,
     LEVEL1,
-    NONE
-
+    NONE,
+    LEVEL2
 }
 
 public enum ESoundType

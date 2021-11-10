@@ -5,12 +5,12 @@ using UnityEngine;
 public class CharacterManager : Singleton<CharacterManager>
 {
     #region Fields
-    private CharacterControllerE _characterController = null;
+    private RagdollController _characterController = null;
     #endregion Fields
 
 
     #region Property
-    public CharacterControllerE CharacterController
+    public RagdollController CharacterController
     {
 
         get
@@ -30,7 +30,7 @@ public class CharacterManager : Singleton<CharacterManager>
 
 
     #region Methods
-   public void Initialize()
+    public void Initialize()
    {
 
    }
