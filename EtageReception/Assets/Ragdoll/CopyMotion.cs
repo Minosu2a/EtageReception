@@ -13,8 +13,7 @@ public class CopyMotion : MonoBehaviour
     void Start()
     {
         _cj = GetComponent<ConfigurableJoint>();
-        _copyTarget = transform.GetParent(_howDeep).Find("a" + gameObject.name);
-        Debug.Log(_copyTarget);
+        _copyTarget = transform.FindParentDeep("Elephant").FindDeep("a" + gameObject.name);
     }
 
     void Update()

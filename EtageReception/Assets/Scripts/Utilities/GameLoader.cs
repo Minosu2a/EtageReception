@@ -15,7 +15,7 @@ public class GameLoader : MonoBehaviour
     {
         _gameStateManager.Initialize();
         _gameLoopManager.Initialize();
-        _inputManager.Initialize();
+        //_inputManager.Initialize();
         GameStateManager.Instance.LaunchTransition(_sceneToLoadFirst);
     }
 

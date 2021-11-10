@@ -10,6 +10,7 @@ public class AnimationInfo
 
     public List<InfoAnimation> Animations { get => _animations; set => _animations = value; }
 
+
     [Serializable]
     public struct InfoAnimation
     {

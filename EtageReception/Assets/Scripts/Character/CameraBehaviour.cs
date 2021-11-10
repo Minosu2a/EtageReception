@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ClemCAddons;
 
 public class CameraBehaviour : MonoBehaviour
 {
@@ -42,14 +43,13 @@ public class CameraBehaviour : MonoBehaviour
     void Update()
     {
         //MOVE THE Z POS
-       float ZPlayerPos = Mathf.InverseLerp(_wallFront.position.z, _wallBack.position.z, CharacterManager.Instance.CharacterController.transform.position.z);
-
+       float ZPlayerPos = Mathf.InverseLerp(_wallFront.position.z, _wallBack.position.z, CharacterManager.Instance.CharacterController.transform.FindDeep("Root").position.z);
        float ZPosToUpdate = Mathf.Lerp(_maximumZ.position.z, _minimumZ.position.z, ZPlayerPos);
 
 
 
         //MOVE THE X POS
-        float XPlayerPos = Mathf.InverseLerp(_wallRight.position.x, _wallLeft.position.x, CharacterManager.Instance.CharacterController.transform.position.x);
+        float XPlayerPos = Mathf.InverseLerp(_wallRight.position.x, _wallLeft.position.x, CharacterManager.Instance.CharacterController.transform.FindDeep("Root").position.x);
 
         float XPosToUpdate = Mathf.Lerp(_maximumX.position.x, _minimumX.position.x, XPlayerPos);
 
