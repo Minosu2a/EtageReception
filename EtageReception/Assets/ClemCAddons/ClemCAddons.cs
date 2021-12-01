@@ -9,12 +9,42 @@ using System.Diagnostics;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace ClemCAddons
 {
     #region Extensions
     public static class Extensions
     {
+        #region Byte formatting
+        public static dynamic ToType(this byte[] bytes, Type type)
+        {
+            var binformatter = new BinaryFormatter();
+            var stream = new MemoryStream(bytes);
+            return Convert.ChangeType(binformatter.Deserialize(stream), type);
+        } // noice. Am actually impressed with it
+        public static object ToObject(this byte[] bytes)
+        {
+            var binformatter = new BinaryFormatter();
+            var stream = new MemoryStream(bytes);
+            return binformatter.Deserialize(stream);
+        }
+        public static byte[] ToBytes(this object value)
+        {
+            var binformatter = new BinaryFormatter();
+            var stream = new MemoryStream();
+            binformatter.Serialize(stream, value);
+            return stream.ToArray();
+        }
+        public static Stream ToSerializedStream(this object value)
+        {
+            var binformatter = new BinaryFormatter();
+            var stream = new MemoryStream();
+            binformatter.Serialize(stream, value);
+            return stream;
+        }
+        #endregion Byte formatting
         #region ArrayAdditions
         #region Remove
         public static T[] RemoveAt<T>(this T[] source, int index) // thanks stack overflow

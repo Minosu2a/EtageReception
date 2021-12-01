@@ -23,21 +23,71 @@ public class RagdollController : MonoBehaviour
     [Header("Grab")]
     private bool _isGrabbing = false;
 
-    [SerializeField] private GrabDetection _grabDetection = null;
-    [SerializeField] private GameObject _centerGrabPoint = null;
+    private GameObject _centerGrabPoint = null;
 
     private GameObject _objectGrabbed = null;
 
-    [SerializeField] private Rigidbody _trompeRigidbody = null;
+    public Transform Root
+    {
+        get
+        {
+            _root = transform.FindDeep("Root");
+            return _root;
+        }
+        set
+        {
+            _root = value;
+        }
+    }
 
+    public Animator Animator
+    {
+        get
+        {
+            _animator = transform.FindDeep("AnimationBody").GetComponent<Animator>();
+            return _animator;
+        }
+        set
+        {
+            _animator = value;
+        }
+    }
+
+    public GrabDetection GrabDetection
+    {
+        get
+        {
+            return GrabDetection.GetComponent<GrabDetection>();
+        }
+    }
+
+    public GameObject CenterGrabPoint
+    {
+        get
+        {
+            if(_centerGrabPoint == null)
+                _centerGrabPoint = transform.FindDeep("GrabPoint").gameObject;
+            return _centerGrabPoint;
+        }
+        set
+        {
+            _centerGrabPoint = value;
+        }
+    }
+
+    public Rigidbody TrompeRigidbody
+    {
+        get
+        {
+            return CenterGrabPoint.transform.parent.GetComponent<Rigidbody>();
+        }
+    }
 
     void Start()
     {
         CharacterManager.Instance.CharacterController = this;
         var r = FindObjectsOfType<CopyMotion>();
         joints = r.Select(t => t.gameObject).ToList();
-        _animator = transform.FindDeep("AnimationBody").GetComponent<Animator>();
-        _root = transform.FindDeep("Root");
     }
 
     void Update()
@@ -105,8 +155,8 @@ public class RagdollController : MonoBehaviour
     private void TurnRootTowards(Vector3 vector)
     {
         var dir = vector.SetY(0).normalized;
-        _root.GetComponent<ConfigurableJoint>().targetRotation =
-            Quaternion.Lerp(_root.GetComponent<ConfigurableJoint>().targetRotation, dir.DirectionToQuaternion(), _turningSpeed * 0.1f * Time.deltaTime);
+        Root.GetComponent<ConfigurableJoint>().targetRotation =
+            Quaternion.Lerp(Root.GetComponent<ConfigurableJoint>().targetRotation, dir.DirectionToQuaternion(), _turningSpeed * 0.1f * Time.deltaTime);
     }
 
     #region Animation
@@ -128,7 +178,7 @@ public class RagdollController : MonoBehaviour
                 CopyJointAnimation(r[i]);
         var rand = new System.Random();
         int t = rand.Next();
-        _animator.SetTrigger(animation.Name);
+        Animator.SetTrigger(animation.Name);
         for (int i = 0; i < _currentAnimations.Count; i++)
             _currentAnimations[i] = new KeyValuePair<int, KeyValuePair<float, AnimationInfo.InfoAnimation>>(_currentAnimations[i].Key, new KeyValuePair<float, AnimationInfo.InfoAnimation>(_currentAnimations[i].Value.Key - Mathf.RoundToInt(animation.Anim.length * 1000), _currentAnimations[i].Value.Value));
         _currentAnimations.Add(new KeyValuePair<int, KeyValuePair<float, AnimationInfo.InfoAnimation>>(t, new KeyValuePair<float, AnimationInfo.InfoAnimation>(Mathf.RoundToInt(animation.Anim.length * 1000), animation)));
@@ -149,7 +199,7 @@ public class RagdollController : MonoBehaviour
             if (r != null)
                 for (int i = 0; i < r.Length; i++)
                     StopCopyingJointAnimation(r[i]);
-            _animator.SetTrigger(_currentAnimations[0].Value.Value.Name+"End");
+            Animator.SetTrigger(_currentAnimations[0].Value.Value.Name+"End");
             _currentAnimations.RemoveAt(0);
         }
     }
@@ -182,17 +232,17 @@ public class RagdollController : MonoBehaviour
     }
     public void AddForceOnJoint(string joint, Vector3 force, float max)
     {
-        force = _root.GetComponent<Rigidbody>().velocity.magnitude > max ? Vector3.zero : force;
+        force = Root.GetComponent<Rigidbody>().velocity.magnitude > max ? Vector3.zero : force;
         transform.FindDeep(joint).GetComponent<Rigidbody>().AddForce(force);
     }
     public void AddForceOnJoint(CopyMotion joint, Vector3 force, float max)
     {
-        force = _root.GetComponent<Rigidbody>().velocity.magnitude > max ? Vector3.zero : force;
+        force = Root.GetComponent<Rigidbody>().velocity.magnitude > max ? Vector3.zero : force;
         joint.GetComponent<Rigidbody>().AddForce(force);
     }
     public void AddForceOnJoint(Rigidbody joint, Vector3 force, float max)
     {
-        force = _root.GetComponent<Rigidbody>().velocity.magnitude > max ? Vector3.zero : force;
+        force = Root.GetComponent<Rigidbody>().velocity.magnitude > max ? Vector3.zero : force;
         joint.AddForce(force);
     }
 
@@ -200,15 +250,15 @@ public class RagdollController : MonoBehaviour
     #region Grab
     public GameObject DetectObject()
     {
-        if (_grabDetection.GrabRangeObject.Count > 0)
+        if (GrabDetection.GrabRangeObject.Count > 0)
         {
             float smallerDistance = 0;
             int integerOfCloserObject = 0;
 
-            for (int i = 0; i < _grabDetection.GrabRangeObject.Count; i++)
+            for (int i = 0; i < GrabDetection.GrabRangeObject.Count; i++)
             {
 
-                float dist = Vector3.Distance(_grabDetection.GrabRangeObject[i].transform.position, _centerGrabPoint.transform.position);
+                float dist = Vector3.Distance(GrabDetection.GrabRangeObject[i].transform.position, CenterGrabPoint.transform.position);
 
                 if (i == 0)
                 {
@@ -222,7 +272,7 @@ public class RagdollController : MonoBehaviour
                 }
             }
 
-            GameObject closestObject = _grabDetection.GrabRangeObject[integerOfCloserObject];
+            GameObject closestObject = GrabDetection.GrabRangeObject[integerOfCloserObject];
             return closestObject;
 
         }
@@ -240,13 +290,13 @@ public class RagdollController : MonoBehaviour
                 {
                     ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
                     
-                    fj.connectedBody = _trompeRigidbody;
+                    fj.connectedBody = TrompeRigidbody;
 
                     fj.xMotion = ConfigurableJointMotion.Locked;
                     fj.yMotion = ConfigurableJointMotion.Locked;
                     fj.zMotion = ConfigurableJointMotion.Locked;
 
-                    fj.anchor = _objectGrabbed.transform.GetLocal(_objectGrabbed.transform.position.Direction(_trompeRigidbody.position)).NormalizeTo(0.5f);
+                    fj.anchor = _objectGrabbed.transform.GetLocal(_objectGrabbed.transform.position.Direction(TrompeRigidbody.position)).NormalizeTo(0.5f);
                     _isGrabbing = true;
                 }
             }

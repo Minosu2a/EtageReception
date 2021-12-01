@@ -1730,18 +1730,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 913f93c2930debf418971afdcab2da91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maximumZ: {fileID: 575429575}
-  _minimumZ: {fileID: 486909443}
-  _wallFront: {fileID: 108087515}
-  _wallBack: {fileID: 278784313}
-  _maximumX: {fileID: 1568625962}
-  _minimumX: {fileID: 1995146724}
-  _wallRight: {fileID: 177613927}
-  _wallLeft: {fileID: 1104407008}
-  _rotationRight: {x: -0.17216268, y: 0.12854333, z: -0.02266567, w: -0.97638255}
-  _rotationLeft: {x: 0.17216259, y: 0.12854321, z: -0.022665637, w: 0.9763826}
-  _movementSmoothValue: 0.2
-  _rotationSmoothValue: 0.6
+  _centerOfMap: {fileID: 0}
+  _rightMaximumXCamPos: {fileID: 0}
+  _leftMaximumXCamPos: {fileID: 0}
+  _rightMaximumXPlayerPos: {fileID: 0}
+  _leftMaximumXPlayerPos: {fileID: 0}
+  _leftRotationMaxLooking: 334.5
+  _rightRotationMaxLooking: 65.5
+  _zConstantDistance: 3
+  _yConstantDistance: 6
+  _xConstantRotation: 20
 --- !u!1 &1995146723
 GameObject:
   m_ObjectHideFlags: 0
