@@ -1359,7 +1359,6 @@ namespace ClemCAddons
             return quaternion;
         }
         #endregion QuaternionAdditions
-        
     }
     #endregion Extensions
     namespace Utilities
