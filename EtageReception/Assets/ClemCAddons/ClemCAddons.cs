@@ -843,7 +843,12 @@ namespace ClemCAddons
             return Vector3.Lerp(r, vector, res).normalized; // a + (b -a ) * x
         }
         #endregion Random
-
+        #region NormalizeTo
+        public static Vector3 NormalizeTo(this Vector3 vector, float n)
+        {
+            return vector.normalized * n;
+        }
+        #endregion NormalizeTo
         #endregion Vector3 Additions
         #region Vector2 Additions
         #region Direction
@@ -1017,6 +1022,24 @@ namespace ClemCAddons
         }
         #endregion Basic conversions
         #region Transform Additions
+        #region Anchors
+        public static Vector3 GetWorldAnchor(this Transform transform, Vector3 localSpaceAnchor)
+        {
+            return transform.TransformVector(localSpaceAnchor);
+        }
+        public static Vector3 GetWorldAnchorPosition(this Transform transform, Vector3 localSpaceAnchor)
+        {
+            return transform.position + transform.TransformVector(localSpaceAnchor);
+        }
+        public static Vector3 GetLocalAnchor(this Transform transform, Vector3 worldSpaceAnchor)
+        {
+            return transform.InverseTransformVector(worldSpaceAnchor);
+        }
+        public static Vector3 GetLocalAnchorPosition(this Transform transform, Vector3 worldSpaceAnchor)
+        {
+            return transform.InverseTransformPoint(transform.position + worldSpaceAnchor);
+        }
+        #endregion Anchors
         public static int ActiveChildCount(this Transform transform)
         {
             int r = 0;
@@ -1336,6 +1359,7 @@ namespace ClemCAddons
             return quaternion;
         }
         #endregion QuaternionAdditions
+        
     }
     #endregion Extensions
     namespace Utilities

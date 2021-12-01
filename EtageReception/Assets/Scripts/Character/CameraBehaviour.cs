@@ -59,7 +59,6 @@ public class CameraBehaviour : MonoBehaviour
 
         float YPlayerPos = Mathf.Lerp(_zoomFront, _zoomBack, XPlayerPos);
 
-        Debug.Log(YPlayerPos);
 
         Vector3 objPos = new Vector3(XPosToUpdate, YPlayerPos, ZPosToUpdate);
         transform.position = Vector3.Lerp(transform.position, objPos, Time.smoothDeltaTime / _movementSmoothValue);
