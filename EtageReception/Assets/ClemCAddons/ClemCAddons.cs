@@ -901,57 +901,71 @@ namespace ClemCAddons
         #endregion ToVector3
         #endregion Vector2 Additions
         #region float Additions
+        #region RemoveInfinity
+        public static float RemoveInfinity(this float value, bool InfiniteToMin = false)
+        {
+            if (value == float.PositiveInfinity)
+                return InfiniteToMin?float.MinValue: float.MaxValue;
+            if (value == float.NegativeInfinity)
+                return InfiniteToMin?float.MaxValue: float.MinValue;
+            return value;
+        }
+        #endregion RemoveInfinity
         #region GetMaxs
         public static float GetMax(this Vector3 vector, bool abs = false)
         {
-            return vector.x.Max(vector.y, vector.z, abs);
+            return vector.x.Max(abs, vector.y, vector.z);
         }
 
         public static float GetMaxXY(this Vector3 vector, bool abs = false)
         {
-            return vector.x.Max(vector.y, abs);
+            return vector.x.Max(abs, vector.y);
         }
         public static float GetMaxXZ(this Vector3 vector, bool abs = false)
         {
-            return vector.x.Max(vector.z, abs);
+            return vector.x.Max(abs, vector.z);
         }
         public static float GetMaxYZ(this Vector3 vector, bool abs = false)
         {
-            return vector.y.Max(vector.z, abs);
+            return vector.y.Max(abs, vector.z);
         }
         #endregion GetMaxs
         #region Min Max
-        public static float Min(this float value, float min)
+        public static float Min(this float value, params float[] values)
         {
-            return Mathf.Min(value, min);
+            return Mathf.Min(value, values.Min());
         }
-        public static float Max(this float value, float max)
+        public static float Max(this float value, params float[] values)
         {
-            return Mathf.Max(value, max);
+            return Mathf.Max(value, values.Max());
         }
-        public static float Min(this float value, float min, bool abs = false)
+        public static float Min(this float value, bool abs = false, params float[] values)
         {
-            return abs ? Mathf.Min(value.Abs(), min.Abs()) : Mathf.Min(value, min);
+            return abs ? Mathf.Min(value.Abs(), values.Abs().Min()) : Mathf.Min(value, values.Min());
         }
-        public static float Max(this float value, float max, bool abs = false)
+        public static float Max(this float value, bool abs = false, params float[] values)
         {
-            return abs ? Mathf.Max(value.Abs(), max.Abs()) : Mathf.Max(value, max);
+            return abs ? Mathf.Max(value.Abs(), values.Abs().Max()) : Mathf.Max(value, values.Max());
         }
-        public static float Min(this float value, float value2, float value3)
+        public static float Min(this float value, bool abs = false, bool ignoreInfinity = false, params float[] values)
         {
-            return Mathf.Min(value, value2, value3);
+            if (ignoreInfinity)
+            {
+                for (int i = 0; i < values.Length; i++)
+                    values[i] = values[i].RemoveInfinity(true);
+                value = value.RemoveInfinity();
+            }
+            return abs ? Mathf.Min(value.Abs(), values.Abs().Min()) : Mathf.Min(value, values.Min());
         }
-        public static float Max(this float value, float value2, float value3)
+        public static float Max(this float value, bool abs = false, bool ignoreInfinity = false, params float[] values)
         {
-            return Mathf.Max(value, value2, value3);
-        }
-        public static float Min(this float value, float value2, float value3, bool abs = false)
-        {
-            return abs ? Mathf.Min(value.Abs(), value2.Abs(), value3.Abs()) : Mathf.Min(value, value2, value3);
-        }
-        public static float Max(this float value, float value2, float value3, bool abs = false)
-        {
-            return abs ? Mathf.Max(value.Abs(), value2.Abs(), value3.Abs()) : Mathf.Max(value, value2, value3);
+            if (ignoreInfinity)
+            {
+                for (int i = 0; i < values.Length; i++)
+                   values[i] = values[i].RemoveInfinity(true);
+                value = value.RemoveInfinity();
+            }
+            return abs ? Mathf.Max(value.Abs(), values.Abs().Max()) : Mathf.Max(value, values.Max());
         }
         #endregion Min Max
         #region Clamp
@@ -977,6 +991,12 @@ namespace ClemCAddons
         {
             return Mathf.Abs(f);
         }
+        public static float[] Abs(this float[] f)
+        {
+            for (int i = 0; i < f.Length; i++)
+                f[i] = f[i].Abs();
+            return f;
+        }
         public static float Sum(this Vector2 vector)
         {
             return vector.x + vector.y;
@@ -985,13 +1005,13 @@ namespace ClemCAddons
         {
             return vector.x + vector.y + vector.z;
         }
-        public static float Minus(this float f, float value)
+        public static float Minus(this float f, float value, bool abs = false)
         {
-            return f - value;
+            return abs? Mathf.Abs(f - value): f-value;
         }
-        public static float Minus(this float f, float value, bool maxFirst = false)
+        public static float Minus(this float f, float value, bool maxFirst = false, bool abs = false)
         {
-            return Mathf.Max(f, value) - Mathf.Min(f, value);
+            return abs ? (Mathf.Max(f, value) - Mathf.Min(f, value)).Abs() : Mathf.Max(f, value) - Mathf.Min(f, value);
         }
         public static float MinusAngle(this float f, float value)
         {
@@ -1166,6 +1186,28 @@ namespace ClemCAddons
         {
             var r = gameObject.transform.FindParentWithComponent(type);
             return r == null ? null : r.gameObject;
+        }
+        public static Rect GetWorldRect(this RectTransform rt, Vector2? scale = null)
+        {
+            if (!scale.HasValue)
+                scale = Vector2.one;
+            // Convert the rectangle to world corners and grab the top left
+            Vector3[] corners = new Vector3[4];
+            rt.GetWorldCorners(corners);
+            Vector3 topLeft = corners[0];
+
+            // Rescale the size appropriately based on the current Canvas scale
+            Vector2 scaledSize = new Vector2(scale.Value.x * rt.rect.size.x, scale.Value.y * rt.rect.size.y);
+
+            return new Rect(topLeft, scaledSize);
+        }
+        public static Vector3 AnchorNeutralPosition(this RectTransform rectTransform)
+        {
+            return rectTransform.position + (rectTransform.rect.center * rectTransform.lossyScale).ToVector3();
+        }
+        public static Vector3 AnchorNeutralPosition(this RectTransform rectTransform, bool offset)
+        {
+            return rectTransform.position + ((rectTransform.rect.center - (offset?rectTransform.anchoredPosition:Vector2.zero)) * rectTransform.lossyScale).ToVector3();
         }
         #endregion Transform Additions
         #region Distances
