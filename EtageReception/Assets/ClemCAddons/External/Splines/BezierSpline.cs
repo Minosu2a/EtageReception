@@ -227,6 +227,12 @@ public class BezierSpline : MonoBehaviour {
 	public Vector3 GetDirection(float t) {
 		return GetVelocity(t).normalized;
 	}
+	public Vector3 GetDirectionInCurve(float t, int curve)
+	{
+		if (curves.Length == 1)
+			return GetVelocity(t).normalized;
+		return GetVelocity(Mathf.Lerp(((curve)/((float)curves.Length-1)), (curve + 1) / (float)curves.Length, t)).normalized;
+	}
 
 	public void AddCurve() {
 		Curves curve = curves[curves.Length - 1];

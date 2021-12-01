@@ -64,7 +64,7 @@ public class SplineDecorator : MonoBehaviour {
 							item.transform.localPosition = position;
 							if (lookForward)
 							{
-								item.transform.LookAt(position + spline.GetDirection(p * stepSize));
+								item.transform.LookAt(position + spline.GetDirectionInCurve(p * stepSize, e));
 							}
 							item.transform.parent = transform;
 						}

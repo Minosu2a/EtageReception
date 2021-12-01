@@ -38,32 +38,35 @@ public class RagdollController : MonoBehaviour
 
     void Update()
     {
+        Vector3 camera = Camera.allCameras[0].transform.forward.SetY(0).normalized; // never look down
+        // the currently active camera, always valid unlike .current
         bool input = false;
+        Vector3 right = camera.Right();
         if (InputManager.GetAxis("Forward") > 0)
         {
             input = true;
-            AddForceOnJoint("Root",transform.right * _speed * Time.deltaTime * 1000);
-            AddForceOnJoint("LeftLeg", transform.right * _speed * Time.deltaTime * 1000);
-            AddForceOnJoint("RightLeg", transform.right * _speed * Time.deltaTime * 1000);
+            AddForceOnJoint("Root", right * _speed * Time.deltaTime * 1000);
+            AddForceOnJoint("LeftLeg", right * _speed * Time.deltaTime * 1000);
+            AddForceOnJoint("RightLeg", right * _speed * Time.deltaTime * 1000);
         } else if (InputManager.GetAxis("Forward") < 0)
         {
             input = true;
-            AddForceOnJoint("Root", transform.right * _speed * Time.deltaTime * -1000);
-            AddForceOnJoint("LeftLeg", transform.right * _speed * Time.deltaTime * -1000);
-            AddForceOnJoint("RightLeg", transform.right * _speed * Time.deltaTime * -1000);
+            AddForceOnJoint("Root", right * _speed * Time.deltaTime * -1000);
+            AddForceOnJoint("LeftLeg", right * _speed * Time.deltaTime * -1000);
+            AddForceOnJoint("RightLeg", right * _speed * Time.deltaTime * -1000);
         }
         if (InputManager.GetAxis("Strafe") > 0)
         {
             input = true;
-            AddForceOnJoint("Root", transform.forward * _speed * Time.deltaTime * 1000);
-            AddForceOnJoint("LeftLeg", transform.forward * _speed * Time.deltaTime * 1000);
-            AddForceOnJoint("RightLeg", transform.forward * _speed * Time.deltaTime * 1000);
+            AddForceOnJoint("Root", camera * _speed * Time.deltaTime * 1000);
+            AddForceOnJoint("LeftLeg", camera * _speed * Time.deltaTime * 1000);
+            AddForceOnJoint("RightLeg", camera * _speed * Time.deltaTime * 1000);
         } else if (InputManager.GetAxis("Strafe") < 0)
         {
             input = true;
-            AddForceOnJoint("Root", transform.forward * _speed * Time.deltaTime * -1000);
-            AddForceOnJoint("LeftLeg", transform.forward * _speed * Time.deltaTime * -1000);
-            AddForceOnJoint("RightLeg", transform.forward * _speed * Time.deltaTime * -1000);
+            AddForceOnJoint("Root", camera * _speed * Time.deltaTime * -1000);
+            AddForceOnJoint("LeftLeg", camera * _speed * Time.deltaTime * -1000);
+            AddForceOnJoint("RightLeg", camera * _speed * Time.deltaTime * -1000);
         }
         if (InputManager.GetButtonDown("Jump"))
         {

@@ -658,6 +658,22 @@ namespace ClemCAddons
         {
             return vector - Vector3.Dot(vector, normal) * normal;
         }
+        public static Vector2 Right(this Vector2 vector)
+        {
+            return Vector2.Perpendicular(Vector2.Perpendicular(Vector2.Perpendicular(vector)));
+        }
+        public static Vector2 Left(this Vector2 vector)
+        {
+            return Vector2.Perpendicular(vector);
+        }
+        public static Vector2 Up(this Vector2 vector)
+        {
+            return vector;
+        }
+        public static Vector2 Down(this Vector2 vector)
+        {
+            return Vector2.Perpendicular(Vector2.Perpendicular(vector));
+        }
         #endregion Direction
         #region Min Max
         public static Vector3 Min(this Vector3 vector, float min)
@@ -905,9 +921,9 @@ namespace ClemCAddons
         public static float RemoveInfinity(this float value, bool InfiniteToMin = false)
         {
             if (value == float.PositiveInfinity)
-                return InfiniteToMin?float.MinValue: float.MaxValue;
+                return InfiniteToMin ? float.MinValue : float.MaxValue;
             if (value == float.NegativeInfinity)
-                return InfiniteToMin?float.MaxValue: float.MinValue;
+                return InfiniteToMin ? float.MaxValue : float.MinValue;
             return value;
         }
         #endregion RemoveInfinity
@@ -962,7 +978,7 @@ namespace ClemCAddons
             if (ignoreInfinity)
             {
                 for (int i = 0; i < values.Length; i++)
-                   values[i] = values[i].RemoveInfinity(true);
+                    values[i] = values[i].RemoveInfinity(true);
                 value = value.RemoveInfinity();
             }
             return abs ? Mathf.Max(value.Abs(), values.Abs().Max()) : Mathf.Max(value, values.Max());
@@ -1007,7 +1023,7 @@ namespace ClemCAddons
         }
         public static float Minus(this float f, float value, bool abs = false)
         {
-            return abs? Mathf.Abs(f - value): f-value;
+            return abs ? Mathf.Abs(f - value) : f - value;
         }
         public static float Minus(this float f, float value, bool maxFirst = false, bool abs = false)
         {
@@ -1207,7 +1223,7 @@ namespace ClemCAddons
         }
         public static Vector3 AnchorNeutralPosition(this RectTransform rectTransform, bool offset)
         {
-            return rectTransform.position + ((rectTransform.rect.center - (offset?rectTransform.anchoredPosition:Vector2.zero)) * rectTransform.lossyScale).ToVector3();
+            return rectTransform.position + ((rectTransform.rect.center - (offset ? rectTransform.anchoredPosition : Vector2.zero)) * rectTransform.lossyScale).ToVector3();
         }
         #endregion Transform Additions
         #region Distances
@@ -1428,6 +1444,14 @@ namespace ClemCAddons
                 return (to - from).normalized;
             }
             public static Vector3 Direction(Vector3 from, Vector3 to, bool inverse)
+            {
+                return inverse ? (from - to).normalized : (to - from).normalized;
+            }
+            public static Vector2 DirectionTo(Vector2 from, Vector2 to)
+            {
+                return (to - from).normalized;
+            }
+            public static Vector2 Direction(Vector2 from, Vector2 to, bool inverse)
             {
                 return inverse ? (from - to).normalized : (to - from).normalized;
             }
