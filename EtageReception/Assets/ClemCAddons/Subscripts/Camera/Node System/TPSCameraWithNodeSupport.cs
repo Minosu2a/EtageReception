@@ -20,6 +20,7 @@ namespace ClemCAddons
             [SerializeField] private int _inputSensitivity = 200;
             [Header("Settings")]
             [SerializeField] private float _distance = 2;
+            [SerializeField] private float _heightOffset = 2;
             [SerializeField] private float _linearSmoothing = 0.2f;
             [SerializeField] private float _nodePercSmoothing = 0.2f;
             [SerializeField] private float _nodeFixedTolerance = 0.5f;
@@ -55,7 +56,7 @@ namespace ClemCAddons
             {
                 CamTriangulation(_player.transform);
                 GetInputs();
-                var change = (_position * _distance) + _offSetTurned + _cheatOffsetTurned;
+                var change = (_position * _distance) + Vector3.up * _heightOffset + _offSetTurned + _cheatOffsetTurned;
                 if (_linearSmoothing != 0)
                 { // lerp around the player, but moves with the player as point of reference
                     var position = Vector3.Lerp(_previousPosition, _player.transform.position, Time.smoothDeltaTime / _playerMovementSpring);
@@ -79,7 +80,7 @@ namespace ClemCAddons
                     else
                         transform.position = objective;
                 }
-                transform.LookAt(_player.transform.position + _offSetTurned);
+                transform.LookAt(_player.transform.position + _offSetTurned + Vector3.up * _heightOffset);
             }
 
             private void GetInputs()
