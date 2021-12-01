@@ -10,8 +10,11 @@ using Luminosity.IO;
 public class RagdollController : MonoBehaviour
 {
     [SerializeField] private float _speed = 1;
+    [SerializeField] private float _maxSpeed = 2;
     [SerializeField] private float _jumpStrength = 1;
+    [SerializeField, LabelOverride("Turning Speed %", rangeMin: 0, rangeMax: 100)] private float _turningSpeed = 10f;
     [SerializeField] private AnimationInfo _animations;
+    private Transform _root;
     private Animator _animator;
     private List<GameObject> joints = new List<GameObject>();
     private List<KeyValuePair<int, KeyValuePair<float, AnimationInfo.InfoAnimation>>> _currentAnimations = new List<KeyValuePair<int, KeyValuePair<float, AnimationInfo.InfoAnimation>>>();
@@ -34,6 +37,7 @@ public class RagdollController : MonoBehaviour
         var r = FindObjectsOfType<CopyMotion>();
         joints = r.Select(t => t.gameObject).ToList();
         _animator = transform.FindDeep("AnimationBody").GetComponent<Animator>();
+        _root = transform.FindDeep("Root");
     }
 
     void Update()
@@ -45,34 +49,39 @@ public class RagdollController : MonoBehaviour
         if (InputManager.GetAxis("Forward") > 0)
         {
             input = true;
-            AddForceOnJoint("Root", right * _speed * Time.deltaTime * 1000);
-            AddForceOnJoint("LeftLeg", right * _speed * Time.deltaTime * 1000);
-            AddForceOnJoint("RightLeg", right * _speed * Time.deltaTime * 1000);
+            AddForceOnJoint("Root", right * _speed * Time.deltaTime * 1000, _maxSpeed);
+            AddForceOnJoint("LeftLeg", right * _speed * Time.deltaTime * 1000, _maxSpeed);
+            AddForceOnJoint("RightLeg", right * _speed * Time.deltaTime * 1000, _maxSpeed);
+            TurnRootTowards(right);
         } else if (InputManager.GetAxis("Forward") < 0)
         {
             input = true;
-            AddForceOnJoint("Root", right * _speed * Time.deltaTime * -1000);
-            AddForceOnJoint("LeftLeg", right * _speed * Time.deltaTime * -1000);
-            AddForceOnJoint("RightLeg", right * _speed * Time.deltaTime * -1000);
+            AddForceOnJoint("Root", right * _speed * Time.deltaTime * -1000, _maxSpeed);
+            AddForceOnJoint("LeftLeg", right * _speed * Time.deltaTime * -1000, _maxSpeed);
+            AddForceOnJoint("RightLeg", right * _speed * Time.deltaTime * -1000, _maxSpeed);
+            TurnRootTowards(right * -1);
         }
         if (InputManager.GetAxis("Strafe") > 0)
         {
             input = true;
-            AddForceOnJoint("Root", camera * _speed * Time.deltaTime * 1000);
-            AddForceOnJoint("LeftLeg", camera * _speed * Time.deltaTime * 1000);
-            AddForceOnJoint("RightLeg", camera * _speed * Time.deltaTime * 1000);
-        } else if (InputManager.GetAxis("Strafe") < 0)
+            AddForceOnJoint("Root", camera * _speed * Time.deltaTime * 1000, _maxSpeed);
+            AddForceOnJoint("LeftLeg", camera * _speed * Time.deltaTime * 1000, _maxSpeed);
+            AddForceOnJoint("RightLeg", camera * _speed * Time.deltaTime * 1000, _maxSpeed);
+            TurnRootTowards(camera * -1);
+        }
+        else if (InputManager.GetAxis("Strafe") < 0)
         {
             input = true;
-            AddForceOnJoint("Root", camera * _speed * Time.deltaTime * -1000);
-            AddForceOnJoint("LeftLeg", camera * _speed * Time.deltaTime * -1000);
-            AddForceOnJoint("RightLeg", camera * _speed * Time.deltaTime * -1000);
+            AddForceOnJoint("Root", camera * _speed * Time.deltaTime * -1000, _maxSpeed);
+            AddForceOnJoint("LeftLeg", camera * _speed * Time.deltaTime * -1000, _maxSpeed);
+            AddForceOnJoint("RightLeg", camera * _speed * Time.deltaTime * -1000, _maxSpeed);
+            TurnRootTowards(camera);
         }
         if (InputManager.GetButtonDown("Jump"))
         {
-            AddForceOnJoint("Root", transform.up * _jumpStrength * 1000);
-            AddForceOnJoint("LeftArm", transform.up * _jumpStrength * 1000);
-            AddForceOnJoint("RightArm", transform.up * _jumpStrength * 1000);
+            AddForceOnJoint("Root", transform.up * _jumpStrength * 1000, _maxSpeed);
+            AddForceOnJoint("LeftArm", transform.up * _jumpStrength * 1000, _maxSpeed);
+            AddForceOnJoint("RightArm", transform.up * _jumpStrength * 1000, _maxSpeed);
         }
         if (InputManager.GetButtonDown("Grab"))
         {
@@ -92,6 +101,14 @@ public class RagdollController : MonoBehaviour
             isRunningAnimation = false;
         }
     }
+
+    private void TurnRootTowards(Vector3 vector)
+    {
+        var dir = vector.SetY(0).normalized;
+        _root.GetComponent<ConfigurableJoint>().targetRotation =
+            Quaternion.Lerp(_root.GetComponent<ConfigurableJoint>().targetRotation, dir.DirectionToQuaternion(), _turningSpeed * 0.1f * Time.deltaTime);
+    }
+
     #region Animation
     public void PlayAnimationByName(string name)
     {
@@ -144,6 +161,7 @@ public class RagdollController : MonoBehaviour
 
     private void StopCopyingJointAnimation(CopyMotion joint)
     {
+        joint.GetComponent<ConfigurableJoint>().targetRotation = Quaternion.identity;
         joint.enabled = false;
     }
     #endregion Animation
@@ -162,6 +180,22 @@ public class RagdollController : MonoBehaviour
     {
         joint.gameObject.GetComponent<Rigidbody>().AddForce(force);
     }
+    public void AddForceOnJoint(string joint, Vector3 force, float max)
+    {
+        force = _root.GetComponent<Rigidbody>().velocity.magnitude > max ? Vector3.zero : force;
+        transform.FindDeep(joint).GetComponent<Rigidbody>().AddForce(force);
+    }
+    public void AddForceOnJoint(CopyMotion joint, Vector3 force, float max)
+    {
+        force = _root.GetComponent<Rigidbody>().velocity.magnitude > max ? Vector3.zero : force;
+        joint.GetComponent<Rigidbody>().AddForce(force);
+    }
+    public void AddForceOnJoint(Rigidbody joint, Vector3 force, float max)
+    {
+        force = _root.GetComponent<Rigidbody>().velocity.magnitude > max ? Vector3.zero : force;
+        joint.AddForce(force);
+    }
+
     #endregion Joints
     #region Grab
     public GameObject DetectObject()
@@ -212,7 +246,7 @@ public class RagdollController : MonoBehaviour
                     fj.yMotion = ConfigurableJointMotion.Locked;
                     fj.zMotion = ConfigurableJointMotion.Locked;
 
-                    fj.anchor = _objectGrabbed.transform.GetLocalAnchor(_objectGrabbed.transform.position.Direction(_trompeRigidbody.position)).NormalizeTo(0.5f);
+                    fj.anchor = _objectGrabbed.transform.GetLocal(_objectGrabbed.transform.position.Direction(_trompeRigidbody.position)).NormalizeTo(0.5f);
                     _isGrabbing = true;
                 }
             }
