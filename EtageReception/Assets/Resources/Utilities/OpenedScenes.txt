@@ -1,1 +1,2 @@
+Assets/Scenes/PersistentManagers.unity
 Assets/Scenes/AdrienLD.unity

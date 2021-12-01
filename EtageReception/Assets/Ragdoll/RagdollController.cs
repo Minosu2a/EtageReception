@@ -202,22 +202,14 @@ public class RagdollController : MonoBehaviour
                 if (_objectGrabbed.GetComponent<ConfigurableJoint>() != null)
                 {
                     ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
-
+                    
                     fj.connectedBody = _trompeRigidbody;
 
                     fj.xMotion = ConfigurableJointMotion.Locked;
                     fj.yMotion = ConfigurableJointMotion.Locked;
                     fj.zMotion = ConfigurableJointMotion.Locked;
 
-                    float xrot = _objectGrabbed.transform.rotation.x;
-                    float yrot = _objectGrabbed.transform.rotation.y;
-                    float zrot = _objectGrabbed.transform.rotation.z;
-
-                    //QUEL BORDEL ENVIE DE ME BATTRE LA
-                    // WHY DOESNT IT WANT TO TURN FFS!
-                    //WHY DOES APPLYING THE ROTATION NOT TURN A GLOBAL ROTATION TO A LOCAL ROTATION
-
-                    fj.anchor = Vector3.forward;
+                    fj.anchor = _objectGrabbed.transform.GetLocalAnchor(_objectGrabbed.transform.position.Direction(_trompeRigidbody.position)).NormalizeTo(0.5f);
                     _isGrabbing = true;
                 }
             }
