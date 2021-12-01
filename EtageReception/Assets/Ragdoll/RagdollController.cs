@@ -144,6 +144,7 @@ public class RagdollController : MonoBehaviour
 
     private void StopCopyingJointAnimation(CopyMotion joint)
     {
+        joint.GetComponent<ConfigurableJoint>().targetRotation = Quaternion.identity;
         joint.enabled = false;
     }
     #endregion Animation
