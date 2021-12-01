@@ -646,6 +646,10 @@ namespace ClemCAddons
         {
             return Quaternion.Euler(euler);
         }
+        public static Quaternion DirectionToQuaternion(this Vector3 direction)
+        {
+            return Quaternion.LookRotation(direction, Vector3.up);
+        }
         public static Quaternion ToQuaternion(this Vector3 NormalizedVector, Quaternion rotation)
         {
             return Quaternion.FromToRotation(Vector3.up, NormalizedVector) * rotation;
@@ -782,6 +786,24 @@ namespace ClemCAddons
             return result;
         }
         #endregion Add
+        #region Operations
+        public static Vector3 Add(this Vector3 vector, float value)
+        {
+            return new Vector3(vector.x + value, vector.y + value, vector.z + value);
+        }
+        public static Vector3 Substract(this Vector3 vector, float value)
+        {
+            return new Vector3(vector.x - value, vector.y - value, vector.z - value);
+        }
+        public static Vector3 Multiply(this Vector3 vector, float value)
+        {
+            return new Vector3(vector.x * value, vector.y * value, vector.z * value);
+        }
+        public static Vector3 Divide(this Vector3 vector, float value)
+        {
+            return new Vector3(vector.x / value, vector.y / value, vector.z / value);
+        }
+        #endregion Operations
         #region isBetween
         public static bool IsBetween(this Vector3 vector, Vector3 bound1, Vector3 bound2)
         {
@@ -1059,21 +1081,21 @@ namespace ClemCAddons
         #endregion Basic conversions
         #region Transform Additions
         #region Anchors
-        public static Vector3 GetWorldAnchor(this Transform transform, Vector3 localSpaceAnchor)
+        public static Vector3 GetWorld(this Transform transform, Vector3 localSpace)
         {
-            return transform.TransformVector(localSpaceAnchor);
+            return transform.TransformVector(localSpace);
         }
-        public static Vector3 GetWorldAnchorPosition(this Transform transform, Vector3 localSpaceAnchor)
+        public static Vector3 GetWorldPosition(this Transform transform, Vector3 localSpace)
         {
-            return transform.position + transform.TransformVector(localSpaceAnchor);
+            return transform.position + transform.TransformVector(localSpace);
         }
-        public static Vector3 GetLocalAnchor(this Transform transform, Vector3 worldSpaceAnchor)
+        public static Vector3 GetLocal(this Transform transform, Vector3 worldSpace)
         {
-            return transform.InverseTransformVector(worldSpaceAnchor);
+            return transform.InverseTransformVector(worldSpace);
         }
-        public static Vector3 GetLocalAnchorPosition(this Transform transform, Vector3 worldSpaceAnchor)
+        public static Vector3 GetLocalPosition(this Transform transform, Vector3 worldSpace)
         {
-            return transform.InverseTransformPoint(transform.position + worldSpaceAnchor);
+            return transform.InverseTransformPoint(transform.position + worldSpace);
         }
         #endregion Anchors
         public static int ActiveChildCount(this Transform transform)
