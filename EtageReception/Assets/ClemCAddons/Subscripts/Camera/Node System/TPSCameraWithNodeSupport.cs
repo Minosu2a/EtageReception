@@ -25,12 +25,16 @@ namespace ClemCAddons
             [SerializeField] private float _nodePercSmoothing = 0.2f;
             [SerializeField] private float _nodeFixedTolerance = 0.5f;
             [SerializeField] private float _playerMovementSpring = 0.02f;
+            [SerializeField] private bool _customPlayerClass = false;
+            [SerializeField, DrawIf("_customPlayerClass", true, ComparisonType.Equals)] private string _playerClassName;
+            [SerializeField] private bool _useDifferentTransform = false;
+            [SerializeField, DrawIf("_useDifferentTransform", true, ComparisonType.Equals)] private Transform _differentTransform;
             [Header("Camera boom")]
             [SerializeField] private string _cameraHitTag = "Hittable";
             [SerializeField] private float _cameraBoomSmoothing = 0.05f;
             [SerializeField] private float _obstacleMinimumDistance = 0.1f;
 
-            private CharacterMovement _player = null;
+            private dynamic _player = null;
             private float _defaultDistance;
             private Vector3 _position = Vector3.forward;
             private Vector2 _currentOffset = Vector2.zero;
@@ -43,25 +47,43 @@ namespace ClemCAddons
             private Vector3 _cheatOffsetTurned = Vector3.forward;
             private float _cameraBoomD = 0f;
 
+            private bool isPlayerCharacterMovement
+            {
+                get
+                {
+                    return _player.GetType() == typeof(CharacterMovement);
+                }
+            }
+
+            private Transform playerTransform
+            {
+                get
+                {
+                    return _useDifferentTransform ? _differentTransform : (Transform)_player.transform;
+                }
+            }
 
             void Start()
             {
                 _defaultDistance = _distance;
-                _player = FindObjectOfType<CharacterMovement>();
+                if (_customPlayerClass)
+                    _player = FindObjectOfType(Type.GetType(_playerClassName));
+                else
+                    _player = FindObjectOfType<CharacterMovement>();
                 var r = FindObjectOfType<NodeHelperSettings>();
                 _settings = r != null ? r.Settings : new NodeHelpSettings(false, false);
             }
 
             void Update()
             {
-                CamTriangulation(_player.transform);
+                CamTriangulation(playerTransform);
                 GetInputs();
                 var change = (_position * _distance) + Vector3.up * _heightOffset + _offSetTurned + _cheatOffsetTurned;
                 if (_linearSmoothing != 0)
                 { // lerp around the player, but moves with the player as point of reference
-                    var position = Vector3.Lerp(_previousPosition, _player.transform.position, Time.smoothDeltaTime / _playerMovementSpring);
+                    var position = Vector3.Lerp(_previousPosition, playerTransform.position, Time.smoothDeltaTime / _playerMovementSpring);
                     var objective = position + change;
-                    bool t = _player.transform.position.CastToSphereOnly(objective, _player.CollisionLayer, _cameraHitTag, _obstacleMinimumDistance, out RaycastHit hit);
+                    bool t = (playerTransform).position.CastToSphereOnly(objective, (LayerMask)(isPlayerCharacterMovement ? _player.CollisionLayer : LayerMask.NameToLayer("Default")), _cameraHitTag, _obstacleMinimumDistance, out RaycastHit hit);
                     if (t)
                         _cameraBoomD = Mathf.Lerp(_cameraBoomD, hit.distance, Time.smoothDeltaTime / _cameraBoomSmoothing);
                     else
@@ -73,14 +95,14 @@ namespace ClemCAddons
                 }
                 else
                 {
-                    var objective = _player.transform.position + change;
-                    bool t = _player.transform.position.CastToSphereOnly(objective, _player.CollisionLayer, _cameraHitTag, _obstacleMinimumDistance, out RaycastHit hit);
+                    var objective = playerTransform.position + change;
+                    bool t = playerTransform.position.CastToSphereOnly(objective, (LayerMask)(isPlayerCharacterMovement? _player.CollisionLayer: LayerMask.NameToLayer("Default")), _cameraHitTag, _obstacleMinimumDistance, out RaycastHit hit);
                     if (t)
                         transform.position = hit.point;
                     else
                         transform.position = objective;
                 }
-                transform.LookAt(_player.transform.position + _offSetTurned + Vector3.up * _heightOffset);
+                transform.LookAt(playerTransform.position + _offSetTurned + Vector3.up * _heightOffset);
             }
 
             private void GetInputs()
@@ -250,13 +272,13 @@ namespace ClemCAddons
                     }
                     if (node.UseSafeZone)
                     {
-                        if (Vector3.Distance(_player.transform.position, pos) <= node.SafeZoneSize)
+                        if (Vector3.Distance(playerTransform.position, pos) <= node.SafeZoneSize)
                         {
                             distPerc = 1;
                         }
                         else
                         {
-                            distPerc = (1 / (node.SafeZoneSize / node.Content.range)) - (Vector3.Distance(_player.transform.position, pos) / node.Content.range / (node.SafeZoneSize / node.Content.range));
+                            distPerc = (1 / (node.SafeZoneSize / node.Content.range)) - (Vector3.Distance(playerTransform.position, pos) / node.Content.range / (node.SafeZoneSize / node.Content.range));
                             distPerc = Mathf.Clamp01(distPerc * (1f + _nodePercSmoothing) - _nodePercSmoothing);
                             if (node.SafeZoneSize < 0)
                             {
@@ -266,7 +288,7 @@ namespace ClemCAddons
                     }
                     else
                     {
-                        distPerc = 1 - (Vector3.Distance(_player.transform.position, pos) / (node.Content.range));
+                        distPerc = 1 - (Vector3.Distance(playerTransform.position, pos) / (node.Content.range));
                         distPerc = Mathf.Clamp01(distPerc * (1f + _nodePercSmoothing) - _nodePercSmoothing);
                     }
                 }
@@ -274,24 +296,24 @@ namespace ClemCAddons
                 {
                     var t1 = pos;
                     var t2 = pos;
-                    if (GameTools.IsInRectangle(t2, node.SafeDimensions, _player.transform.position))
+                    if (GameTools.IsInRectangle(t2, node.SafeDimensions, playerTransform.position))
                     {
                         distPerc = 1;
                     }
                     else
                     {
-                        var pos1 = GameTools.ClosestOnCube(_player.transform.position, t1, node.Dimensions, BoxCollider, !Application.isPlaying && _settings.ShowRectangularDebug);
-                        var pos2 = GameTools.ClosestOnCube(_player.transform.position, t2, node.SafeDimensions, BoxCollider, Application.isPlaying && _settings.ShowRectangularDebug);
+                        var pos1 = GameTools.ClosestOnCube(playerTransform.position, t1, node.Dimensions, BoxCollider, !Application.isPlaying && _settings.ShowRectangularDebug);
+                        var pos2 = GameTools.ClosestOnCube(playerTransform.position, t2, node.SafeDimensions, BoxCollider, Application.isPlaying && _settings.ShowRectangularDebug);
                         if (!Application.isPlaying)
                         {
                             if (_settings.ShowRectangularDebug)
                             {
-                                EditorTools.DrawLineInEditor(pos1, _player.transform.position, Color.red);
-                                EditorTools.DrawLineInEditor(pos2, _player.transform.position, Color.red);
+                                EditorTools.DrawLineInEditor(pos1, playerTransform.position, Color.red);
+                                EditorTools.DrawLineInEditor(pos2, playerTransform.position, Color.red);
                             }
                         }
-                        var dist1 = Vector3.Distance(pos1, _player.transform.position);
-                        var dist2 = Vector3.Distance(pos2, _player.transform.position);
+                        var dist1 = Vector3.Distance(pos1, playerTransform.position);
+                        var dist2 = Vector3.Distance(pos2, playerTransform.position);
                         distPerc = dist1 / (dist2 + dist1);
                     }
                 }
@@ -324,6 +346,7 @@ namespace ClemCAddons
                     _boxCollider = value;
                 }
             }
+
             private float[] GetSumTo1(float[] normalizedDistances)
             {
                 float[] result = new float[normalizedDistances.Length];
