@@ -1964,6 +1964,43 @@ namespace ClemCAddons
         #region Timer
         public class Timer
         {
+            public static bool MinimumDelay(int id, float duration, bool clearIfSuccess = true)
+            {
+                var c = timers.FindIndex(t => t.Key == id);
+                if (c != -1)
+                {
+                    var t = timers.Find(t => t.Key == id);
+                    if (t.Value.ElapsedMilliseconds > duration)
+                    {
+                        if (clearIfSuccess)
+                        {
+                            t.Value.Stop();
+                            timers.RemoveAt(c);
+                        }
+                        return true;
+                    }
+                    return false;
+                } else
+                {
+                    Stopwatch r = new Stopwatch();
+                    r.Start();
+                    timers.Add(new KeyValuePair<int, Stopwatch>(id, r));
+                    if (duration == 0)
+                        return true;
+                    return false;
+
+                }
+            }
+            public static void ClearDelay(int id)
+            {
+                var c = timers.FindIndex(t => t.Key == id);
+                if (c != -1)
+                {
+                    var t = timers.Find(t => t.Key == id);
+                    t.Value.Stop();
+                    timers.RemoveAt(c);
+                }
+            }
             public delegate void TimerCallback();
             private static readonly List<KeyValuePair<int, Stopwatch>> timers = new List<KeyValuePair<int, Stopwatch>>();
             public static void StartTimer(int id)
@@ -1979,16 +2016,46 @@ namespace ClemCAddons
                 timers.Add(new KeyValuePair<int, Stopwatch>(id, r));
                 HandleCallback(r, delay, callback, loop);
             }
+            public static void StartTimer<T>(int id, int delay, Action<T> callback, T value, bool loop = true)
+            {
+                Stopwatch r = new Stopwatch();
+                r.Start();
+                timers.Add(new KeyValuePair<int, Stopwatch>(id, r));
+                HandleCallback(r, delay, callback, value, loop);
+            }
             private async static void HandleCallback(Stopwatch stopwatch, int delay, TimerCallback callback, bool loop)
             {
                 while (stopwatch.IsRunning)
                 {
-                    await Task.Delay(delay);
+                    await Task.Delay(5);
+                    delay--;
+                    if (delay > 0)
+                        continue;
                     if (stopwatch.IsRunning)
                     {
                         stopwatch.Stop();
                         timers.Remove(timers.Find(t => t.Value == stopwatch));
                         callback.Invoke();
+                        if (!loop)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            private async static void HandleCallback<T>(Stopwatch stopwatch, int delay, Action<T> callback, T value, bool loop)
+            {
+                while (stopwatch.IsRunning)
+                {
+                    await Task.Delay(5);
+                    delay--;
+                    if (delay > 0)
+                        continue;
+                    if (stopwatch.IsRunning)
+                    {
+                        stopwatch.Stop();
+                        timers.Remove(timers.Find(t => t.Value == stopwatch));
+                        callback.Invoke(value);
                         if (!loop)
                         {
                             break;
@@ -2012,8 +2079,10 @@ namespace ClemCAddons
             {
                 var r = timers.Find(t => t.Key == id);
                 if (!r.Equals(default(KeyValuePair<int, Stopwatch>)))
+                {
                     r.Value.Stop();
-                timers.RemoveAll(t => t.Key == id);
+                    timers.RemoveAll(t => t.Key == id);
+                }
             }
             public static void StopTimer(int id)
             {

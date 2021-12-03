@@ -17,9 +17,8 @@ public class RagdollController : MonoBehaviour
     private Transform _root;
     private Animator _animator;
     private List<GameObject> joints = new List<GameObject>();
-    private List<KeyValuePair<int, KeyValuePair<float, AnimationInfo.InfoAnimation>>> _currentAnimations = new List<KeyValuePair<int, KeyValuePair<float, AnimationInfo.InfoAnimation>>>();
-    private bool isRunningAnimation = true;
-
+    private List<string> _currentAnimations = new List<string>();
+    private bool isRunningWalkAnimation = true;
     [Header("Grab")]
     private bool _isGrabbing = false;
 
@@ -137,18 +136,32 @@ public class RagdollController : MonoBehaviour
         {
             Grab();
         }
-        if (!isRunningAnimation && input)
+        if(input == true)
         {
-            var random = new System.Random();
-            var t = random.Next(10);
-            if(t < 5)
-                PlayAnimationByName(t < 3 ? "NarutoRun" : "Dab");
-            PlayAnimationByName("Walk");
-            isRunningAnimation = true;
+            if(ClemCAddons.Utilities.Timer.MinimumDelay("hellobitch".GetHashCode(), 1000))
+            {
+                var random = new System.Random();
+                var t = random.Next(10);
+                if (t < 5)
+                {
+                    var currentAnimations = GetCurrentAnimations();
+                    if(!currentAnimations.Contains("NarutoRun") && !currentAnimations.Contains("Dab"))
+                        PlayAnimationByName(t < 3 ? "NarutoRun" : "Dab", false);
+                }
+            }
         }
-        if (!input)
+        if (!isRunningWalkAnimation && input)
         {
-            isRunningAnimation = false;
+            var rand = new System.Random();
+            PlayAnimationByName("Walk"+rand.Next(1,3), true);
+            isRunningWalkAnimation = true;
+        }
+        if (isRunningWalkAnimation && !input && transform.FindDeep("Root").GetComponent<Rigidbody>().velocity.magnitude < _maxSpeed * 0.1f)
+        {
+            StopCurrentAnimation("Walk1");
+            StopCurrentAnimation("Walk2");
+            StopCurrentAnimation("Walk3");
+            isRunningWalkAnimation = false;
         }
     }
 
@@ -160,48 +173,53 @@ public class RagdollController : MonoBehaviour
     }
 
     #region Animation
-    public void PlayAnimationByName(string name)
+    public void PlayAnimationByName(string name, bool loop = false)
     {
         // standard behavior will ignore the second condition if the first is false, avoiding running into a potential error
         var r = _animations.Animations.Where(t => t.Name == name);
         if(r.Any())
         {
-            StartAnimation(r.First());
+            StartAnimation(r.First(), loop);
         }
     }
 
-    public void StartAnimation(AnimationInfo.InfoAnimation animation, bool stopAfterTime = false)
+    public string[] GetCurrentAnimations()
+    {
+        var r = new List<string>();
+        for(int i = 0; i < Animator.parameterCount; i++)
+        {
+            if(Animator.GetBool(Animator.GetParameter(i).name) == true)
+            {
+                r.Add(Animator.GetParameter(i).name);
+            }
+        }
+        return r.ToArray();
+    }
+
+    public void StartAnimation(AnimationInfo.InfoAnimation animation, bool loop = false)
     {
         var r = joints.FindAll(t => animation.UsedJoints.Contains(t.GetComponent<ConfigurableJoint>())).Select(t => t.GetComponent<CopyMotion>()).ToArray();
         if (r != null)
             for(int i = 0; i < r.Length; i++)
                 CopyJointAnimation(r[i]);
-        var rand = new System.Random();
-        int t = rand.Next();
-        Animator.SetTrigger(animation.Name);
-        for (int i = 0; i < _currentAnimations.Count; i++)
-            _currentAnimations[i] = new KeyValuePair<int, KeyValuePair<float, AnimationInfo.InfoAnimation>>(_currentAnimations[i].Key, new KeyValuePair<float, AnimationInfo.InfoAnimation>(_currentAnimations[i].Value.Key - Mathf.RoundToInt(animation.Anim.length * 1000), _currentAnimations[i].Value.Value));
-        _currentAnimations.Add(new KeyValuePair<int, KeyValuePair<float, AnimationInfo.InfoAnimation>>(t, new KeyValuePair<float, AnimationInfo.InfoAnimation>(Mathf.RoundToInt(animation.Anim.length * 1000), animation)));
-        if (!stopAfterTime)
+        Animator.SetBool(animation.Name,true);
+        _currentAnimations.Add(animation.Name);
+        if (!loop)
         {
-            ClemCAddons.Utilities.Timer.StartTimer(t, Mathf.RoundToInt(animation.Anim.length * 1000), StopCurrentAnimation, false);
+            ClemCAddons.Utilities.Timer.StartTimer(animation.Name.GetHashCode(), Mathf.RoundToInt(animation.Anim.length * 100), (obj) => StopCurrentAnimation(animation.Name), animation.Name, false);
         }
     }
 
-    public void StopCurrentAnimation()
+    public void StopCurrentAnimation(string animation)
     {
-        if(_currentAnimations.Count() > 0)
-        {
-            var res = _currentAnimations.Select(t => t.Value.Key).Min();
-            var v = _currentAnimations.Find(e => e.Value.Key == res);
-            ClemCAddons.Utilities.Timer.StopTimer(v.Key);
-            var r = joints.FindAll(t => _currentAnimations[0].Value.Value.UsedJoints.Contains(t.GetComponent<ConfigurableJoint>())).Select(t => t.GetComponent<CopyMotion>()).ToArray();
-            if (r != null)
-                for (int i = 0; i < r.Length; i++)
-                    StopCopyingJointAnimation(r[i]);
-            Animator.SetTrigger(_currentAnimations[0].Value.Value.Name+"End");
-            _currentAnimations.RemoveAt(0);
-        }
+        ClemCAddons.Utilities.Timer.StopTimer(animation.GetHashCode());
+        var r = _animations.Animations.Where(t => t.Name == animation);
+        var res = joints.FindAll(t => r.First().UsedJoints.Contains(t.GetComponent<ConfigurableJoint>())).Select(t => t.GetComponent<CopyMotion>()).ToArray();
+        if (res != null)
+            for (int i = 0; i < res.Length; i++)
+                StopCopyingJointAnimation(res[i]);
+        Animator.SetBool(animation, false);
+        _currentAnimations.Remove(animation);
     }
 
     private void CopyJointAnimation(CopyMotion joint)
@@ -212,6 +230,7 @@ public class RagdollController : MonoBehaviour
     private void StopCopyingJointAnimation(CopyMotion joint)
     {
         joint.GetComponent<ConfigurableJoint>().targetRotation = Quaternion.identity;
+        joint.GetComponent<ConfigurableJoint>().targetPosition = Vector3.zero;
         joint.enabled = false;
     }
     #endregion Animation

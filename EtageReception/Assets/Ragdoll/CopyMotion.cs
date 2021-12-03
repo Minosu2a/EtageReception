@@ -18,9 +18,12 @@ public class CopyMotion : MonoBehaviour
 
     void Update()
     {
-        if(_mirror)
-            _cj.targetRotation = Quaternion.Inverse(_copyTarget.rotation);
+        _cj.targetPosition = _copyTarget.localPosition;
+        if (_mirror)
+        {
+            _cj.targetRotation = Quaternion.Inverse(_copyTarget.localRotation);
+        }
         else
-            _cj.targetRotation = _copyTarget.rotation;
+            _cj.targetRotation = _copyTarget.localRotation;
     }
 }
