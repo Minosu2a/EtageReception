@@ -6007,42 +6007,6 @@ MonoBehaviour:
         m_gamepadButton: 0
         m_gamepadAxis: 0
         m_gamepadIndex: 0
-    - m_name: Horizontal
-      m_description: 
-      m_bindings:
-      - m_positive: 100
-        m_negative: 113
-        m_deadZoneType: 0
-        m_deadZone: 0
-        m_gravity: 3
-        m_sensitivity: 3
-        m_scale: 1
-        m_snap: 1
-        m_invert: 0
-        m_type: 2
-        m_axis: 0
-        m_joystick: 0
-        m_gamepadButton: 0
-        m_gamepadAxis: 0
-        m_gamepadIndex: 0
-    - m_name: Vertical
-      m_description: 
-      m_bindings:
-      - m_positive: 122
-        m_negative: 115
-        m_deadZoneType: 0
-        m_deadZone: 0
-        m_gravity: 3
-        m_sensitivity: 3
-        m_scale: 1
-        m_snap: 1
-        m_invert: 0
-        m_type: 2
-        m_axis: 0
-        m_joystick: 0
-        m_gamepadButton: 0
-        m_gamepadAxis: 0
-        m_gamepadIndex: 0
     - m_name: LookHorizontal
       m_description: 
       m_bindings:
@@ -6051,7 +6015,7 @@ MonoBehaviour:
         m_deadZoneType: 0
         m_deadZone: 0
         m_gravity: 1
-        m_sensitivity: 0.1
+        m_sensitivity: 1
         m_scale: 1
         m_snap: 0
         m_invert: 0
@@ -6069,7 +6033,7 @@ MonoBehaviour:
         m_deadZoneType: 0
         m_deadZone: 0
         m_gravity: 1
-        m_sensitivity: 0.1
+        m_sensitivity: 1
         m_scale: 1
         m_snap: 0
         m_invert: 0
@@ -11564,6 +11528,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
+--- !u!4 &639462038 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8016564557886282593, guid: 23583c753f4ed04429b75706c0bc7e33, type: 3}
+  m_PrefabInstance: {fileID: 639462037}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &642110539
 Mesh:
   m_ObjectHideFlags: 0
@@ -11834,6 +11803,10 @@ MonoBehaviour:
   _nodePercSmoothing: 0.2
   _nodeFixedTolerance: 0.5
   _playerMovementSpring: 0.02
+  _customPlayerClass: 1
+  _playerClassName: RagdollController
+  _useDifferentTransform: 1
+  _differentTransform: {fileID: 639462038}
   _cameraHitTag: Hittable
   _cameraBoomSmoothing: 0.05
   _obstacleMinimumDistance: 0.2
