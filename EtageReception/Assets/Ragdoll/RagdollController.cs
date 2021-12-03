@@ -57,7 +57,7 @@ public class RagdollController : MonoBehaviour
     {
         get
         {
-            return GrabDetection.GetComponent<GrabDetection>();
+            return CenterGrabPoint.GetComponent<GrabDetection>();
         }
     }
 
