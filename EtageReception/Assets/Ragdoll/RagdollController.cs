@@ -128,9 +128,16 @@ public class RagdollController : MonoBehaviour
         }
         if (InputManager.GetButtonDown("Jump"))
         {
-            AddForceOnJoint("Root", transform.up * _jumpStrength * 1000, _maxSpeed);
-            AddForceOnJoint("LeftArm", transform.up * _jumpStrength * 1000, _maxSpeed);
-            AddForceOnJoint("RightArm", transform.up * _jumpStrength * 1000, _maxSpeed);
+            var l = transform.FindDeep("LeftLeg");
+            var r = transform.FindDeep("RightLeg");
+            var groundLeft = GameTools.FindGround(l.position, 0, l.lossyScale.y, LayerMask.GetMask("Obstacles"));
+            var groundRight = GameTools.FindGround(r.position, 0, r.lossyScale.y, LayerMask.GetMask("Obstacles"));
+            if(!groundLeft.Equals(l.lossyScale.y) || !groundRight.Equals(r.lossyScale.y))
+            {
+                AddForceOnJoint("Root", transform.up * _jumpStrength * 1000, _maxSpeed);
+                AddForceOnJoint("LeftArm", transform.up * _jumpStrength * 1000, _maxSpeed);
+                AddForceOnJoint("RightArm", transform.up * _jumpStrength * 1000, _maxSpeed);
+            }
         }
         if (InputManager.GetButtonDown("Grab"))
         {
@@ -301,22 +308,14 @@ public class RagdollController : MonoBehaviour
 
     public void Grab()
     {
+
         if (_isGrabbing == false)
         {
             if ((_objectGrabbed = DetectObject()) != null)
             {
                 if (_objectGrabbed.GetComponent<ConfigurableJoint>() != null)
                 {
-                    ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
-                    
-                    fj.connectedBody = TrompeRigidbody;
-
-                    fj.xMotion = ConfigurableJointMotion.Locked;
-                    fj.yMotion = ConfigurableJointMotion.Locked;
-                    fj.zMotion = ConfigurableJointMotion.Locked;
-
-                    fj.anchor = _objectGrabbed.transform.GetLocal(_objectGrabbed.transform.position.Direction(TrompeRigidbody.position)).NormalizeTo(0.5f);
-                    _isGrabbing = true;
+                    StartCoroutine(GrabE());
                 }
             }
         }
@@ -331,5 +330,41 @@ public class RagdollController : MonoBehaviour
         }
 
     }
-#endregion Grab
+
+    private IEnumerator GrabE()
+    {
+        yield return CreateElongate(TrompeRigidbody.gameObject, 10, 3);
+        ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
+
+        fj.connectedBody = TrompeRigidbody;
+
+        fj.xMotion = ConfigurableJointMotion.Locked;
+        fj.yMotion = ConfigurableJointMotion.Locked;
+        fj.zMotion = ConfigurableJointMotion.Locked;
+
+        fj.anchor = _objectGrabbed.transform.GetLocal(_objectGrabbed.transform.position.Direction(TrompeRigidbody.position)).NormalizeTo(0.5f);
+        _isGrabbing = true;
+    }
+
+    private IEnumerator CreateElongate(GameObject source, float speed, int chainLength = 1)
+    {
+        var r = Instantiate(source, source.transform.position + Vector3.zero.SetY(0.05f), source.transform.rotation);
+        r.transform.localScale = source.transform.lossyScale.SetY(0);
+        r.GetComponent<ConfigurableJoint>().connectedBody = null;
+        while(r.transform.localScale.y < source.transform.lossyScale.y)
+        {
+            yield return new WaitForEndOfFrame();
+            r.transform.position = source.transform.position + (source.transform.up * -1 * source.transform.lossyScale.y) * (r.transform.localScale.y / source.transform.lossyScale.y);
+            r.transform.localScale = r.transform.localScale.SetY(r.transform.localScale.y + source.transform.lossyScale.y * Time.smoothDeltaTime * speed).Min(source.transform.lossyScale.y);
+            r.transform.rotation = source.transform.rotation;
+        }
+        r.GetComponent<ConfigurableJoint>().connectedBody = source.GetComponent<Rigidbody>();
+        chainLength--;
+        if(chainLength > 0)
+        {
+            StartCoroutine(CreateElongate(r, speed, chainLength));
+        }
+    }
+
+    #endregion Grab
 }

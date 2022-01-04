@@ -19,6 +19,8 @@ namespace ClemCAddons
             [SerializeField] private string _verticalMovement = "LookVertical";
             [SerializeField] private int _inputSensitivity = 200;
             [Header("Settings")]
+            [SerializeField] private bool _scrollToZoom = false;
+            [SerializeField] private float _scrollSensitivity = 1;
             [SerializeField] private float _distance = 2;
             [SerializeField] private float _heightOffset = 2;
             [SerializeField] private float _linearSmoothing = 0.2f;
@@ -46,6 +48,7 @@ namespace ClemCAddons
             private Vector3 _previousPosition = Vector3.zero;
             private Vector3 _cheatOffsetTurned = Vector3.forward;
             private float _cameraBoomD = 0f;
+            private float _zoom = 0;
 
             private bool isPlayerCharacterMovement
             {
@@ -78,7 +81,7 @@ namespace ClemCAddons
             {
                 CamTriangulation(playerTransform);
                 GetInputs();
-                var change = (_position * _distance) + Vector3.up * _heightOffset + _offSetTurned + _cheatOffsetTurned;
+                var change = (_position * (_distance + _zoom)) + Vector3.up * _heightOffset + _offSetTurned + _cheatOffsetTurned;
                 if (_linearSmoothing != 0)
                 { // lerp around the player, but moves with the player as point of reference
                     var position = Vector3.Lerp(_previousPosition, playerTransform.position, Time.smoothDeltaTime / _playerMovementSpring);
@@ -87,7 +90,7 @@ namespace ClemCAddons
                     if (t)
                         _cameraBoomD = Mathf.Lerp(_cameraBoomD, hit.distance, Time.smoothDeltaTime / _cameraBoomSmoothing);
                     else
-                        _cameraBoomD = Mathf.Lerp(_cameraBoomD, _distance, Time.smoothDeltaTime / _cameraBoomSmoothing);
+                        _cameraBoomD = Mathf.Lerp(_cameraBoomD, (_distance + _zoom), Time.smoothDeltaTime / _cameraBoomSmoothing);
                     change = (_position * _cameraBoomD) + _offSetTurned + _cheatOffsetTurned;
                     transform.position = position + change;
                     _previousChange = change;
@@ -107,6 +110,8 @@ namespace ClemCAddons
 
             private void GetInputs()
             {
+                if (_scrollToZoom && InputManager.mouseScrollDelta.y != 0)
+                    _zoom = (_zoom - InputManager.mouseScrollDelta.y * _scrollSensitivity * 10 * Time.smoothDeltaTime).Clamp(-_distance+0.1f, _distance*2);
                 float x = InputManager.GetAxis(_horizontalMovement);
                 float y = InputManager.GetAxis(_verticalMovement);
                 if (x != 0)
