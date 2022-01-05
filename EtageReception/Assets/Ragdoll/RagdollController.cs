@@ -130,8 +130,8 @@ public class RagdollController : MonoBehaviour
         {
             var l = transform.FindDeep("LeftLeg");
             var r = transform.FindDeep("RightLeg");
-            var groundLeft = GameTools.FindGround(l.position, 0, l.lossyScale.y, LayerMask.GetMask("Obstacles"));
-            var groundRight = GameTools.FindGround(r.position, 0, r.lossyScale.y, LayerMask.GetMask("Obstacles"));
+            var groundLeft = GameTools.FindGround(l.position, 0, l.lossyScale.y * 1.2f, LayerMask.GetMask("Default"));
+            var groundRight = GameTools.FindGround(r.position, 0, r.lossyScale.y * 1.2f, LayerMask.GetMask("Default"));
             if(!groundLeft.Equals(l.lossyScale.y) || !groundRight.Equals(r.lossyScale.y))
             {
                 AddForceOnJoint("Root", transform.up * _jumpStrength * 1000, _maxSpeed);

@@ -6,11 +6,12 @@ TagManager:
   tags:
   - Key
   - Item
+  - Hittable
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Obstacles
+  - Player
   - Water
   - UI
   - 
