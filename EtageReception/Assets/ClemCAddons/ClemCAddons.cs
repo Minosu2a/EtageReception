@@ -703,6 +703,11 @@ namespace ClemCAddons
         {
             return new Vector3(vector.x / value.x, vector.y / value.y, vector.z / value.z);
         }
+
+        public static Vector3 Inverse(this Vector3 vector)
+        {
+            return new Vector3(vector.x == 0?vector.x:1/vector.x, vector.y == 0 ? vector.y : 1 / vector.y, vector.z == 0 ? vector.z : 1 / vector.z);
+        }
         #endregion Operations
         #region Validation
         public static bool IsZero(this Vector3 vector)
@@ -1029,6 +1034,11 @@ namespace ClemCAddons
         public static Vector3 NormalizeTo(this Vector3 vector, float n)
         {
             return vector.normalized * n;
+        }
+
+        public static Vector3 NormalizeTo(this Vector3 vector, Vector3 n)
+        {
+            return vector.normalized.Multiply(n);
         }
         #endregion NormalizeTo
         #endregion Vector3 Additions

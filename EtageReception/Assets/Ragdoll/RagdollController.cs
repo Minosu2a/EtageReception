@@ -341,6 +341,7 @@ public class RagdollController : MonoBehaviour
             fj.xMotion = ConfigurableJointMotion.Free;
             fj.yMotion = ConfigurableJointMotion.Free;
             fj.zMotion = ConfigurableJointMotion.Free;
+            fj.anchor = Vector3.zero;
             _isGrabbing = false;
             var r = transform.FindDeep("TrunkTrashCan");
             GameObject[] toRemove = new GameObject[] { };
@@ -356,19 +357,45 @@ public class RagdollController : MonoBehaviour
 
     private IEnumerator GrabE()
     {
-        var dist = (_objectGrabbed.transform.position + _objectGrabbed.transform.position.Direction(TrompeRigidbody.transform.position).Multiply(_objectGrabbed.transform.lossyScale/1.5f)).Distance(TrompeRigidbody.transform);
-        //                                                                                                                                                          not divided by 2 to go slightly inside the object
-        var r = Mathf.RoundToInt(dist / TrompeRigidbody.transform.lossyScale.y);
-        yield return CreateElongate(TrompeRigidbody.gameObject, 10, r, transform.FindDeep("TrunkTrashCan"));
         ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
 
-        fj.connectedBody = TrompeRigidbody;
+        var closest = _objectGrabbed.GetComponent<Rigidbody>().ClosestPointOnBounds(TrompeRigidbody.transform.position);
+        var dist = closest.Distance(TrompeRigidbody.transform.position);
+        var r = Mathf.FloorToInt(dist / TrompeRigidbody.transform.lossyScale.y);
+        var trashcan = transform.FindDeep("TrunkTrashCan");
 
+        yield return StartCoroutine(CreateElongate(TrompeRigidbody.gameObject, 10, r, trashcan));
+        fj.autoConfigureConnectedAnchor = false;
+        fj.connectedAnchor = TrompeRigidbody.transform.position + (TrompeRigidbody.transform.position.Direction(closest) * r * TrompeRigidbody.transform.lossyScale.y);
+        var x = fj.xDrive;
+        x.positionSpring = 100;
+        fj.xDrive = x;
+        var y = fj.yDrive;
+        y.positionSpring = 100;
+        fj.yDrive = y;
+        var z = fj.zDrive;
+        z.positionSpring = 100;
+        fj.zDrive = z;
+
+        yield return new WaitForSeconds(0.5f);
+        fj.autoConfigureConnectedAnchor = true;
+        x = fj.xDrive;
+        x.positionSpring = 0;
+        fj.xDrive = x;
+        y = fj.yDrive;
+        y.positionSpring = 0;
+        fj.yDrive = y;
+        z = fj.zDrive;
+        z.positionSpring = 0;
+        fj.zDrive = z;
+
+        fj.connectedBody = trashcan.GetChild(trashcan.childCount-1).GetComponent<Rigidbody>();
         fj.xMotion = ConfigurableJointMotion.Locked;
         fj.yMotion = ConfigurableJointMotion.Locked;
         fj.zMotion = ConfigurableJointMotion.Locked;
 
-        fj.anchor = _objectGrabbed.transform.GetLocal(_objectGrabbed.transform.position.Direction(TrompeRigidbody.position)).NormalizeTo(0.5f);
+        fj.anchor = _objectGrabbed.transform.GetLocal(_objectGrabbed.transform.position.Direction(TrompeRigidbody.position)).normalized.NormalizeTo(_objectGrabbed.transform.lossyScale.Inverse() * 1.7f);
+        //need to figure out WHY 1.7 in this particular project
         _isGrabbing = true;
     }
 
