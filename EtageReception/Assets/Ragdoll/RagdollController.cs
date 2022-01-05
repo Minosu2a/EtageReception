@@ -327,13 +327,24 @@ public class RagdollController : MonoBehaviour
             fj.yMotion = ConfigurableJointMotion.Free;
             fj.zMotion = ConfigurableJointMotion.Free;
             _isGrabbing = false;
+            var r = transform.FindDeep("TrunkTrashCan");
+            GameObject[] toRemove = new GameObject[] { };
+            for (int i = 0; i < r.childCount; i++)
+            {
+                toRemove = toRemove.Add(r.GetChild(i).gameObject);
+            }
+            StartCoroutine(RemoveUnElongate(toRemove, 10));
+            
         }
 
     }
 
     private IEnumerator GrabE()
     {
-        yield return CreateElongate(TrompeRigidbody.gameObject, 10, 3);
+        var dist = (_objectGrabbed.transform.position + _objectGrabbed.transform.position.Direction(TrompeRigidbody.transform.position).Multiply(_objectGrabbed.transform.lossyScale/1.5f)).Distance(TrompeRigidbody.transform);
+        //                                                                                                                                                          not divided by 2 to go slightly inside the object
+        var r = Mathf.RoundToInt(dist / TrompeRigidbody.transform.lossyScale.y);
+        yield return CreateElongate(TrompeRigidbody.gameObject, 10, r, transform.FindDeep("TrunkTrashCan"));
         ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
 
         fj.connectedBody = TrompeRigidbody;
@@ -346,9 +357,13 @@ public class RagdollController : MonoBehaviour
         _isGrabbing = true;
     }
 
-    private IEnumerator CreateElongate(GameObject source, float speed, int chainLength = 1)
+    private IEnumerator CreateElongate(GameObject source, float speed, int chainLength = 1, Transform parent = null)
     {
-        var r = Instantiate(source, source.transform.position + Vector3.zero.SetY(0.05f), source.transform.rotation);
+        GameObject r;
+        if(parent != null)
+            r = Instantiate(source, source.transform.position + Vector3.zero.SetY(0.05f), source.transform.rotation, parent);
+        else
+            r = Instantiate(source, source.transform.position + Vector3.zero.SetY(0.05f), source.transform.rotation);
         r.transform.localScale = source.transform.lossyScale.SetY(0);
         r.GetComponent<ConfigurableJoint>().connectedBody = null;
         while(r.transform.localScale.y < source.transform.lossyScale.y)
@@ -362,9 +377,25 @@ public class RagdollController : MonoBehaviour
         chainLength--;
         if(chainLength > 0)
         {
-            StartCoroutine(CreateElongate(r, speed, chainLength));
+            StartCoroutine(CreateElongate(r, speed, chainLength, parent));
         }
     }
+    private IEnumerator RemoveUnElongate(GameObject[] objects, float speed)
+    {
+        while(objects.Length > 0)
+        {
+            yield return new WaitForEndOfFrame();
+            var source = objects.Length > 1 ? objects[objects.Length - 2].transform : TrompeRigidbody.transform;
+            objects[objects.Length - 1].transform.position = source.position + (source.up * -1 * source.lossyScale.y) * (source.localScale.y / source.lossyScale.y);
+            objects[objects.Length - 1].transform.localScale -= Vector3.zero.SetY(Time.smoothDeltaTime * speed);
+            if (objects[objects.Length - 1].transform.localScale.y <= 0)
+            {
+                Destroy(objects[objects.Length - 1]);
+                objects = objects.RemoveAt(objects.Length - 1);
+            }
+        }
+    }
+
 
     #endregion Grab
 }

@@ -11,12 +11,31 @@ using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Text;
 
 namespace ClemCAddons
 {
     #region Extensions
     public static class Extensions
     {
+        #region Type
+        public static Type GetType(this string typeName)
+        {
+            var type = Type.GetType(typeName);
+            if (type != null) return type;
+            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                type = a.GetType(typeName);
+                if (type != null)
+                    return type;
+            }
+            return null;
+        }
+        public static Type GetTypeQualified(this string typeName, string assembly)
+        {
+            return Type.GetType(typeName + ", " + assembly);
+        }
+        #endregion Type
         #region Byte formatting
         public static dynamic ToType(this byte[] bytes, Type type)
         {
@@ -37,6 +56,15 @@ namespace ClemCAddons
             binformatter.Serialize(stream, value);
             return stream.ToArray();
         }
+        public static byte[] ToRawBytes(this string value)
+        {
+            return Encoding.ASCII.GetBytes(value);
+        }
+        public static string ToRawString(this byte[] value)
+        {
+            return Encoding.ASCII.GetString(value);
+        }
+
         public static Stream ToSerializedStream(this object value)
         {
             var binformatter = new BinaryFormatter();
@@ -83,7 +111,7 @@ namespace ClemCAddons
         {
             if (source.Length == 0)
                 return source;
-            for (int i = source.Length; i >= 0; i--)
+            for (int i = source.Length - 1; i >= 0; i--)
             {
                 if (source[i].Equals(toRemove))
                 {
@@ -152,7 +180,7 @@ namespace ClemCAddons
         {
             for (int i = 0; i < source.Length; i++)
             {
-                if (source[i].Equals(value))
+                if (EqualityComparer<T>.Default.Equals(source[i], value))
                 {
                     return i;
                 }
@@ -195,8 +223,41 @@ namespace ClemCAddons
             result[index] = value;
             return result;
         }
+        public static T[] SetOrCreateAt<T>(this T[] source, T value, int index)
+        {
+            if (source.Length <= index)
+            {
+                Array.Resize(ref source, index + 1);
+            }
+            dynamic result = source;
+            result[index] = value;
+            return result;
+        }
+        public static T[] CreateIfNotAt<T>(this T[] source, T value, int index)
+        {
+            if (source.Length <= index)
+            {
+                Array.Resize(ref source, index + 1);
+                dynamic result = source;
+                result[index] = value;
+                return result;
+            }
+            return source;
+        }
         #endregion SetAt
         #endregion ArrayAdditions
+        #region Dictionary Additions
+        public static Dictionary<TKey, TValue> AddOrReplace<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        {
+            if (dictionary.ContainsKey(key))
+            {
+                dictionary[key] = value;
+                return dictionary;
+            }
+            dictionary.Add(key, value);
+            return dictionary;
+        }
+        #endregion Dictioanry Additions
         #region CopyNode
         public static NodeContent Copy(NodeContent source)
         {
@@ -602,6 +663,47 @@ namespace ClemCAddons
 
         #endregion Color Additions
         #region Vector3 Additions
+        #region Geometry
+        public static Vector3 GetCorner(this Vector3 pos, Vector3 corner, Vector3 scale)
+        {
+            return pos + corner.MultiplyEach(scale / 2);
+        }
+        #endregion Geometry
+        #region Operations
+        public static Vector3 Add(this Vector3 vector, float value)
+        {
+            return new Vector3(vector.x + value, vector.y + value, vector.z + value);
+        }
+        public static Vector3 Substract(this Vector3 vector, float value)
+        {
+            return new Vector3(vector.x - value, vector.y - value, vector.z - value);
+        }
+        public static Vector3 Multiply(this Vector3 vector, float value)
+        {
+            return new Vector3(vector.x * value, vector.y * value, vector.z * value);
+        }
+        public static Vector3 Divide(this Vector3 vector, float value)
+        {
+            return new Vector3(vector.x / value, vector.y / value, vector.z / value);
+        }
+        public static Vector3 MultiplyEach(this Vector3 v, Vector3 vector)
+        {
+            return new Vector3(v.x * vector.x, v.y * vector.y, v.z * vector.z);
+        }
+
+        public static Vector3 DivideEach(this Vector3 vector, Vector3 value)
+        {
+            return new Vector3(vector.x / value.x, vector.y / value.y, vector.z / value.z);
+        }
+        public static Vector3 Multiply(this Vector3 vector, Vector3 value)
+        {
+            return new Vector3(vector.x * value.x, vector.y * value.y, vector.z * value.z);
+        }
+        public static Vector3 Divide(this Vector3 vector, Vector3 value)
+        {
+            return new Vector3(vector.x / value.x, vector.y / value.y, vector.z / value.z);
+        }
+        #endregion Operations
         #region Validation
         public static bool IsZero(this Vector3 vector)
         {
@@ -610,6 +712,30 @@ namespace ClemCAddons
         public static bool IsInfinite(this Vector3 vector)
         {
             return vector.Equals(Vector3.positiveInfinity) || vector.Equals(Vector3.negativeInfinity);
+        }
+        public static float IfZero(this float f, float value)
+        {
+            return f.Equals(0) ? value : f;
+        }
+        public static Vector3 IfZero(this Vector3 vector, Vector3 value)
+        {
+            return vector.SetX(vector.x.IfZero(value.x)).SetY(vector.y.IfZero(value.y)).SetZ(vector.z.IfZero(value.z));
+        }
+        public static Vector3 IfZero(this Vector3 vector, float value)
+        {
+            return vector.SetX(vector.x.IfZero(value)).SetY(vector.y.IfZero(value)).SetZ(vector.z.IfZero(value));
+        }
+        public static float IfNZero(this float f, float value, bool keepSign = false)
+        {
+            return f.Equals(0) ? f : value * Mathf.Sign(f);
+        }
+        public static Vector3 IfNZero(this Vector3 vector, Vector3 value, bool keepSign = false)
+        {
+            return vector.SetX(vector.x.IfNZero(value.x, keepSign)).SetY(vector.y.IfNZero(value.y, keepSign)).SetZ(vector.z.IfNZero(value.z, keepSign));
+        }
+        public static Vector3 IfNZero(this Vector3 vector, float value, bool keepSign = false)
+        {
+            return vector.SetX(vector.x.IfNZero(value, keepSign)).SetY(vector.y.IfNZero(value, keepSign)).SetZ(vector.z.IfNZero(value, keepSign));
         }
         #endregion Validation
         #region Direction
@@ -718,6 +844,12 @@ namespace ClemCAddons
         {
             return new Vector3(vector.x.Max(max), vector.y.Max(max), vector.z.Max(max));
         }
+        public static Vector3 Max(this Vector3 vector, float max, bool ignoreSign)
+        {
+            if (!ignoreSign)
+                return vector.Max(max);
+            return new Vector3(vector.x.Abs() > max.Abs() ? vector.x : max, vector.y.Abs() > max.Abs() ? vector.y : max, vector.z.Abs() > max.Abs() ? vector.z : max);
+        }
         public static Vector3 MaxX(this Vector3 vector, float max)
         {
             return new Vector3(vector.x.Max(max), vector.y, vector.z);
@@ -816,24 +948,6 @@ namespace ClemCAddons
             return result;
         }
         #endregion Add
-        #region Operations
-        public static Vector3 Add(this Vector3 vector, float value)
-        {
-            return new Vector3(vector.x + value, vector.y + value, vector.z + value);
-        }
-        public static Vector3 Substract(this Vector3 vector, float value)
-        {
-            return new Vector3(vector.x - value, vector.y - value, vector.z - value);
-        }
-        public static Vector3 Multiply(this Vector3 vector, float value)
-        {
-            return new Vector3(vector.x * value, vector.y * value, vector.z * value);
-        }
-        public static Vector3 Divide(this Vector3 vector, float value)
-        {
-            return new Vector3(vector.x / value, vector.y / value, vector.z / value);
-        }
-        #endregion Operations
         #region isBetween
         public static bool IsBetween(this Vector3 vector, Vector3 bound1, Vector3 bound2)
         {
@@ -919,6 +1033,21 @@ namespace ClemCAddons
         #endregion NormalizeTo
         #endregion Vector3 Additions
         #region Vector2 Additions
+        #region Geometry
+        public static Vector2 PointOnSlope(this Vector2 point, float distanceX, float angle)
+        {
+            var hyp = distanceX / Mathf.Cos(angle);
+            var opposite = hyp * Mathf.Tan(angle); // distance down Y
+            return point + new Vector2(point.x + distanceX, point.y + opposite);
+        }
+        public static Vector2 PointAtAngle(this Vector2 point, float distanceHypotenuse, float angle)
+        {// needs some checking, too tired
+            var hyp = distanceHypotenuse;
+            var side = hyp * Mathf.Cos(angle);
+            var opposite = hyp * Mathf.Sin(angle); // distance down Y
+            return point + new Vector2(point.x + side, point.y + opposite);
+        }
+        #endregion Geometry
         #region Direction
         public static Vector2 Reflect(this Vector2 vector, Vector2 normal)
         {
@@ -1980,7 +2109,8 @@ namespace ClemCAddons
                         return true;
                     }
                     return false;
-                } else
+                }
+                else
                 {
                     Stopwatch r = new Stopwatch();
                     r.Start();
@@ -2025,41 +2155,43 @@ namespace ClemCAddons
             }
             private async static void HandleCallback(Stopwatch stopwatch, int delay, TimerCallback callback, bool loop)
             {
+                int objectiveDelay = delay;
                 while (stopwatch.IsRunning)
                 {
                     await Task.Delay(5);
-                    delay--;
-                    if (delay > 0)
+                    if (stopwatch.ElapsedMilliseconds < objectiveDelay)
                         continue;
                     if (stopwatch.IsRunning)
                     {
-                        stopwatch.Stop();
-                        timers.Remove(timers.Find(t => t.Value == stopwatch));
                         callback.Invoke();
                         if (!loop)
                         {
+                            stopwatch.Stop();
+                            timers.Remove(timers.Find(t => t.Value == stopwatch));
                             break;
                         }
+                        objectiveDelay += delay;
                     }
                 }
             }
             private async static void HandleCallback<T>(Stopwatch stopwatch, int delay, Action<T> callback, T value, bool loop)
             {
+                int objectiveDelay = delay;
                 while (stopwatch.IsRunning)
                 {
                     await Task.Delay(5);
-                    delay--;
-                    if (delay > 0)
+                    if (stopwatch.ElapsedMilliseconds < objectiveDelay)
                         continue;
                     if (stopwatch.IsRunning)
                     {
-                        stopwatch.Stop();
-                        timers.Remove(timers.Find(t => t.Value == stopwatch));
                         callback.Invoke(value);
                         if (!loop)
                         {
+                            stopwatch.Stop();
+                            timers.Remove(timers.Find(t => t.Value == stopwatch));
                             break;
                         }
+                        objectiveDelay += delay;
                     }
                 }
             }
@@ -2101,7 +2233,7 @@ namespace ClemCAddons
             [SerializeField] private double _speed;
             [SerializeField] private double _deceleration;
             [SerializeField] private double _deformation;
-
+            [SerializeField] private bool _limitDeformation = true;
             private double _currentSpeed;
 
             public double CurrentValue { get => _currentValue; set => _currentValue = value; }
@@ -2112,6 +2244,8 @@ namespace ClemCAddons
             public double Deceleration { get => _deceleration; set => _deceleration = value; }
             public double Deformation { get => _deformation; set => _deformation = value; }
             public double CurrentSpeed { get => _currentSpeed; }
+
+            public bool LimitDeformation { get => _limitDeformation; set => _limitDeformation = value; }
 
             public double TilesPerScreen
             {
@@ -2134,7 +2268,7 @@ namespace ClemCAddons
                 _scrollBar.horizontalNormalizedPosition = (float)_currentValue;
             }
 
-            public Slider(ScrollRect scrollbar, double speed, double deceleration, double tileSize, int tilesCount, double deformation, double startValue = 0.5)
+            public Slider(ScrollRect scrollbar, double speed, double deceleration, double tileSize, int tilesCount, double deformation, double startValue = 0.5, bool limitDeformation = true)
             {
                 _scrollBar = scrollbar;
                 _speed = speed;
@@ -2144,6 +2278,7 @@ namespace ClemCAddons
                 _deformation = deformation;
                 _currentValue = startValue;
                 _scrollBar.horizontalNormalizedPosition = (float)startValue;
+                _limitDeformation = limitDeformation;
             }
             public int GetCurrentItem()
             {
@@ -2168,13 +2303,13 @@ namespace ClemCAddons
                 {
                     for (int i = 0; i < res.Length; i++)
                     {
-                        res[i] = new KeyValuePair<int, double>(i, Math.Abs((_tileSize * i * res.Length / (res.Length - 1) * _scrollBar.content.sizeDelta.x / (_tilesCount * _tileSize)) - (_scrollBar.content.sizeDelta.x * _currentValue)));
+                        res[i] = new KeyValuePair<int, double>(i, Math.Abs(_tileSize * (i - ((res.Length - 1) * _currentValue))));
                     }
                     res = res.OrderBy(t => t.Value).ToArray();
                     KeyValuePair<int, double>[] result = new KeyValuePair<int, double>[_tilesCount];
                     for (int i = 0; i < res.Length; i++)
                     {
-                        result[i] = new KeyValuePair<int, double>(res[i].Key, _tileSize * Math.Pow(_deformation, res[i].Value / _tileSize));
+                        result[i] = new KeyValuePair<int, double>(res[i].Key, _tileSize * (_limitDeformation ? Math.Max(_deformation, Math.Pow(_deformation, res[i].Value / _tileSize)) : Math.Pow(_deformation, res[i].Value / _tileSize)));
                     }
                     result = result.OrderBy(t => t.Key).ToArray();
                     return result.Select(t => t.Value).ToArray();
