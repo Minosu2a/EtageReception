@@ -130,13 +130,27 @@ public class RagdollController : MonoBehaviour
         {
             var l = transform.FindDeep("LeftLeg");
             var r = transform.FindDeep("RightLeg");
-            var groundLeft = GameTools.FindGround(l.position, 0, l.lossyScale.y * 1.2f, LayerMask.GetMask("Default"));
-            var groundRight = GameTools.FindGround(r.position, 0, r.lossyScale.y * 1.2f, LayerMask.GetMask("Default"));
-            if(!groundLeft.Equals(l.lossyScale.y) || !groundRight.Equals(r.lossyScale.y))
+            var lValue = l.lossyScale.y * 1.3f;
+            var rValue = r.lossyScale.y * 1.3f;
+            var groundLeft = Physics.Linecast(l.position, l.position + l.forward.Down() * lValue, out _, LayerMask.GetMask("Default"));
+            var groundRight = Physics.Linecast(r.position, r.position + r.forward.Down() * rValue, out _, LayerMask.GetMask("Default"));
+            if (groundLeft || groundRight)
             {
-                AddForceOnJoint("Root", transform.up * _jumpStrength * 1000, _maxSpeed);
-                AddForceOnJoint("LeftArm", transform.up * _jumpStrength * 1000, _maxSpeed);
-                AddForceOnJoint("RightArm", transform.up * _jumpStrength * 1000, _maxSpeed);
+                Vector3 orientation;
+                if(groundLeft && groundRight)
+                {
+                    orientation = (l.up+r.up) / 2;
+                }
+                else if (groundLeft)
+                {
+                    orientation = l.up;
+                } else
+                {
+                    orientation = r.up;
+                }
+                AddForceOnJoint("Root", orientation * _jumpStrength * 1000, _maxSpeed);
+                AddForceOnJoint("LeftArm", orientation * _jumpStrength * 1000, _maxSpeed);
+                AddForceOnJoint("RightArm", orientation * _jumpStrength * 1000, _maxSpeed);
             }
         }
         if (InputManager.GetButtonDown("Grab"))

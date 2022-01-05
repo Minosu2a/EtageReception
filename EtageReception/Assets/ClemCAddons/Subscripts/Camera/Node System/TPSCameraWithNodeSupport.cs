@@ -86,7 +86,7 @@ namespace ClemCAddons
                 { // lerp around the player, but moves with the player as point of reference
                     var position = Vector3.Lerp(_previousPosition, playerTransform.position, Time.smoothDeltaTime / _playerMovementSpring);
                     var objective = position + change;
-                    bool t = (playerTransform).position.CastToSphereOnly(objective, (LayerMask)(isPlayerCharacterMovement ? _player.CollisionLayer : 1 << LayerMask.NameToLayer("Default")), _cameraHitTag, _obstacleMinimumDistance, out RaycastHit hit,true);
+                    bool t = (playerTransform).position.CastToSphereOnly(objective, (LayerMask)(isPlayerCharacterMovement ? _player.CollisionLayer : 1 << LayerMask.NameToLayer("Default")), _cameraHitTag, _obstacleMinimumDistance, out RaycastHit hit);
                     if (t)
                         _cameraBoomD = Mathf.Lerp(_cameraBoomD, hit.distance, Time.smoothDeltaTime / _cameraBoomSmoothing);
                     else
