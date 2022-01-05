@@ -101,14 +101,14 @@ public class RagdollController : MonoBehaviour
             AddForceOnJoint("Root", right * _speed * Time.deltaTime * 1000, _maxSpeed);
             AddForceOnJoint("LeftLeg", right * _speed * Time.deltaTime * 1000, _maxSpeed);
             AddForceOnJoint("RightLeg", right * _speed * Time.deltaTime * 1000, _maxSpeed);
-            TurnRootTowards(right);
+            TurnRootTowards(camera);
         } else if (InputManager.GetAxis("Forward") < 0)
         {
             input = true;
             AddForceOnJoint("Root", right * _speed * Time.deltaTime * -1000, _maxSpeed);
             AddForceOnJoint("LeftLeg", right * _speed * Time.deltaTime * -1000, _maxSpeed);
             AddForceOnJoint("RightLeg", right * _speed * Time.deltaTime * -1000, _maxSpeed);
-            TurnRootTowards(right * -1);
+            TurnRootTowards(camera * -1);
         }
         if (InputManager.GetAxis("Strafe") > 0)
         {
@@ -116,7 +116,7 @@ public class RagdollController : MonoBehaviour
             AddForceOnJoint("Root", camera * _speed * Time.deltaTime * 1000, _maxSpeed);
             AddForceOnJoint("LeftLeg", camera * _speed * Time.deltaTime * 1000, _maxSpeed);
             AddForceOnJoint("RightLeg", camera * _speed * Time.deltaTime * 1000, _maxSpeed);
-            TurnRootTowards(camera * -1);
+            TurnRootTowards(right * -1);
         }
         else if (InputManager.GetAxis("Strafe") < 0)
         {
@@ -124,7 +124,7 @@ public class RagdollController : MonoBehaviour
             AddForceOnJoint("Root", camera * _speed * Time.deltaTime * -1000, _maxSpeed);
             AddForceOnJoint("LeftLeg", camera * _speed * Time.deltaTime * -1000, _maxSpeed);
             AddForceOnJoint("RightLeg", camera * _speed * Time.deltaTime * -1000, _maxSpeed);
-            TurnRootTowards(camera);
+            TurnRootTowards(right);
         }
         if (InputManager.GetButtonDown("Jump"))
         {
@@ -175,8 +175,9 @@ public class RagdollController : MonoBehaviour
     private void TurnRootTowards(Vector3 vector)
     {
         var dir = vector.SetY(0).normalized;
-        Root.GetComponent<ConfigurableJoint>().targetRotation =
-            Quaternion.Lerp(Root.GetComponent<ConfigurableJoint>().targetRotation, dir.DirectionToQuaternion(), _turningSpeed * 0.1f * Time.deltaTime);
+        Root.GetComponent<ConfigurableJoint>().targetRotation = Quaternion.Lerp(Root.GetComponent<ConfigurableJoint>().targetRotation,
+            dir.FullToQuaternion(),
+            _turningSpeed * 0.1f * Time.deltaTime);
     }
 
     #region Animation
