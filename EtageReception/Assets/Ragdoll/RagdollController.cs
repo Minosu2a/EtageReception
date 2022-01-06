@@ -15,6 +15,7 @@ public class RagdollController : MonoBehaviour
     [SerializeField] private float _jumpStrength = 1;
     [SerializeField, LabelOverride("Turning Speed %", rangeMin: 0, rangeMax: 100)] private float _turningSpeed = 10f;
     [SerializeField] private AnimationInfo _animations;
+    [SerializeField] private float DivideBy = 10f;
     private Transform _root;
     private Animator _animator;
     private List<GameObject> joints = new List<GameObject>();
@@ -353,7 +354,7 @@ public class RagdollController : MonoBehaviour
             {
                 toRemove = toRemove.Add(r.GetChild(i).gameObject);
             }
-            _objectGrabbed.GetComponent<Rigidbody>().mass *= 2f;
+            _objectGrabbed.GetComponent<Rigidbody>().mass *= DivideBy;
             StartCoroutine(RemoveUnElongate(toRemove, 10));
             
         }
@@ -363,7 +364,7 @@ public class RagdollController : MonoBehaviour
     private IEnumerator GrabE()
     {
         ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
-        _objectGrabbed.GetComponent<Rigidbody>().mass *= 0.5f;
+        _objectGrabbed.GetComponent<Rigidbody>().mass *= 1 / DivideBy;
         var closest = _objectGrabbed.GetComponent<Rigidbody>().ClosestPointOnBounds(TrompeRigidbody.transform.position);
         var dist = closest.Distance(TrompeRigidbody.transform.position);
         var r = Mathf.FloorToInt(dist / TrompeRigidbody.transform.lossyScale.y);
