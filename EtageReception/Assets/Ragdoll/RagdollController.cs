@@ -361,6 +361,7 @@ public class RagdollController : MonoBehaviour
             {
                 toRemove = toRemove.Add(r.GetChild(i).gameObject);
             }
+            _objectGrabbed.GetComponent<Rigidbody>().mass *= 2f;
             StartCoroutine(RemoveUnElongate(toRemove, 10));
             
         }
@@ -370,7 +371,7 @@ public class RagdollController : MonoBehaviour
     private IEnumerator GrabE()
     {
         ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
-
+        _objectGrabbed.GetComponent<Rigidbody>().mass *= 0.5f;
         var closest = _objectGrabbed.GetComponent<Rigidbody>().ClosestPointOnBounds(TrompeRigidbody.transform.position);
         var dist = closest.Distance(TrompeRigidbody.transform.position);
         var r = Mathf.FloorToInt(dist / TrompeRigidbody.transform.lossyScale.y);
