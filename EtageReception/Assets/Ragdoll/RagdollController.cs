@@ -9,6 +9,7 @@ using Luminosity.IO;
 
 public class RagdollController : MonoBehaviour
 {
+    [SerializeField] private float _distanceFeetPerc = 1.5f;
     [SerializeField] private float _speed = 1;
     [SerializeField] private float _maxSpeed = 2;
     [SerializeField] private float _jumpStrength = 1;
@@ -95,14 +96,14 @@ public class RagdollController : MonoBehaviour
         // the currently active camera, always valid unlike .current
         bool input = false;
         Vector3 right = camera.Right();
-        if (InputManager.GetAxis("Forward") > 0)
+        if (InputManager.GetAxis("Strafe") > 0)
         {
             input = true;
             AddForceOnJoint("Root", right * _speed * Time.deltaTime * 1000, _maxSpeed);
             AddForceOnJoint("LeftLeg", right * _speed * Time.deltaTime * 1000, _maxSpeed);
             AddForceOnJoint("RightLeg", right * _speed * Time.deltaTime * 1000, _maxSpeed);
             TurnRootTowards(camera);
-        } else if (InputManager.GetAxis("Forward") < 0)
+        } else if (InputManager.GetAxis("Strafe") < 0)
         {
             input = true;
             AddForceOnJoint("Root", right * _speed * Time.deltaTime * -1000, _maxSpeed);
@@ -110,7 +111,7 @@ public class RagdollController : MonoBehaviour
             AddForceOnJoint("RightLeg", right * _speed * Time.deltaTime * -1000, _maxSpeed);
             TurnRootTowards(camera * -1);
         }
-        if (InputManager.GetAxis("Strafe") > 0)
+        if (InputManager.GetAxis("Forward") > 0)
         {
             input = true;
             AddForceOnJoint("Root", camera * _speed * Time.deltaTime * 1000, _maxSpeed);
@@ -118,7 +119,7 @@ public class RagdollController : MonoBehaviour
             AddForceOnJoint("RightLeg", camera * _speed * Time.deltaTime * 1000, _maxSpeed);
             TurnRootTowards(right * -1);
         }
-        else if (InputManager.GetAxis("Strafe") < 0)
+        else if (InputManager.GetAxis("Forward") < 0)
         {
             input = true;
             AddForceOnJoint("Root", camera * _speed * Time.deltaTime * -1000, _maxSpeed);
@@ -128,20 +129,23 @@ public class RagdollController : MonoBehaviour
         }
         if (InputManager.GetButtonDown("Jump"))
         {
+            Physics.SyncTransforms();
             var l = transform.FindDeep("LeftLeg");
             var r = transform.FindDeep("RightLeg");
-            var lValue = l.lossyScale.y * 1.3f;
-            var rValue = r.lossyScale.y * 1.3f;
-            var groundLeft = Physics.Linecast(l.position, l.position + l.forward.Down() * lValue, out _, LayerMask.GetMask("Default"));
-            var groundRight = Physics.Linecast(r.position, r.position + r.forward.Down() * rValue, out _, LayerMask.GetMask("Default"));
-            if (groundLeft || groundRight)
+            var lValue = l.lossyScale.y * _distanceFeetPerc;
+            var rValue = r.lossyScale.y * _distanceFeetPerc;
+            var rayL = new Ray(l.position + l.forward.Up() * lValue, l.forward.Down());
+            var rayR = new Ray(r.position + r.forward.Up() * rValue, r.forward.Down());
+            var groundLeft = Physics.RaycastAll(rayL, lValue * 2, 1 << LayerMask.NameToLayer("Default"));
+            var groundRight = Physics.RaycastAll(rayR, rValue * 2, 1 << LayerMask.NameToLayer("Default"));
+            if (groundLeft.Length > 0 || groundRight.Length > 0)
             {
                 Vector3 orientation;
-                if(groundLeft && groundRight)
+                if(groundLeft.Length > 0 && groundRight.Length > 0)
                 {
                     orientation = (l.up+r.up) / 2;
                 }
-                else if (groundLeft)
+                else if (groundLeft.Length > 0)
                 {
                     orientation = l.up;
                 } else
