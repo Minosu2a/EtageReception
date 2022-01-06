@@ -24,6 +24,9 @@ public class RagdollController : MonoBehaviour
     [Header("Grab")]
     private bool _isGrabbing = false;
 
+    private bool groundLeft;
+    private bool groundRight;
+
     private GameObject _centerGrabPoint = null;
 
     private GameObject _objectGrabbed = null;
@@ -91,6 +94,16 @@ public class RagdollController : MonoBehaviour
         joints = r.Select(t => t.gameObject).ToList();
     }
 
+    void FixedUpdate()
+    {
+        var l = transform.FindDeep("LeftLeg");
+        var r = transform.FindDeep("RightLeg");
+        var lValue = l.lossyScale.y * _distanceFeetPerc;
+        var rValue = r.lossyScale.y * _distanceFeetPerc;
+        groundLeft = Physics.Linecast(l.position, l.position + l.forward.Down() * lValue * 2, 1 << LayerMask.NameToLayer("Default"));
+        groundRight = Physics.Linecast(r.position, r.position + r.forward.Down() * rValue * 2, 1 << LayerMask.NameToLayer("Default"));
+    }
+
     void Update()
     {
         Vector3 camera = Camera.allCameras[0].transform.forward.SetY(0).normalized; // never look down
@@ -130,32 +143,26 @@ public class RagdollController : MonoBehaviour
         }
         if (InputManager.GetButtonDown("Jump"))
         {
-            Physics.SyncTransforms();
-            var l = transform.FindDeep("LeftLeg");
-            var r = transform.FindDeep("RightLeg");
-            var lValue = l.lossyScale.y * _distanceFeetPerc;
-            var rValue = r.lossyScale.y * _distanceFeetPerc;
-            var rayL = new Ray(l.position + l.forward.Up() * lValue, l.forward.Down());
-            var rayR = new Ray(r.position + r.forward.Up() * rValue, r.forward.Down());
-            var groundLeft = Physics.RaycastAll(rayL, lValue * 2, 1 << LayerMask.NameToLayer("Default"));
-            var groundRight = Physics.RaycastAll(rayR, rValue * 2, 1 << LayerMask.NameToLayer("Default"));
-            if (groundLeft.Length > 0 || groundRight.Length > 0)
+            if (groundLeft || groundRight)
             {
+                var l = transform.FindDeep("LeftLeg");
+                var r = transform.FindDeep("RightLeg");
                 Vector3 orientation;
-                if(groundLeft.Length > 0 && groundRight.Length > 0)
+                if (groundLeft && groundRight)
                 {
-                    orientation = (l.up+r.up) / 2;
+                    orientation = (l.up + r.up) / 2;
                 }
-                else if (groundLeft.Length > 0)
+                else if (groundLeft)
                 {
                     orientation = l.up;
-                } else
+                }
+                else
                 {
                     orientation = r.up;
                 }
-                AddForceOnJoint("Root", orientation * _jumpStrength * 1000, _maxSpeed);
-                AddForceOnJoint("LeftArm", orientation * _jumpStrength * 1000, _maxSpeed);
-                AddForceOnJoint("RightArm", orientation * _jumpStrength * 1000, _maxSpeed);
+                AddForceOnJoint("Root", orientation * _jumpStrength * 1000);
+                AddForceOnJoint("LeftArm", orientation * _jumpStrength * 1000);
+                AddForceOnJoint("RightArm", orientation * _jumpStrength * 1000);
             }
         }
         if (InputManager.GetButtonDown("Grab"))
@@ -198,6 +205,7 @@ public class RagdollController : MonoBehaviour
             dir.FullToQuaternion(),
             _turningSpeed * 0.1f * Time.deltaTime);
     }
+
 
     #region Animation
     public void PlayAnimationByName(string name, bool loop = false)
