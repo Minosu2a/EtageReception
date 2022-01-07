@@ -2113,7 +2113,7 @@ namespace ClemCAddons
         #region Timer
         public class Timer
         {
-            public static bool MinimumDelay(int id, float duration, bool clearIfSuccess = true)
+            public static bool MinimumDelay(int id, int duration, bool clearOnSuccess = true)
             {
                 var c = timers.FindIndex(t => t.Key == id);
                 if (c != -1)
@@ -2121,7 +2121,7 @@ namespace ClemCAddons
                     var t = timers.Find(t => t.Key == id);
                     if (t.Value.ElapsedMilliseconds > duration)
                     {
-                        if (clearIfSuccess)
+                        if (clearOnSuccess)
                         {
                             t.Value.Stop();
                             timers.RemoveAt(c);

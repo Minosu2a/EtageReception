@@ -143,7 +143,7 @@ public class RagdollController : MonoBehaviour
         }
         if (InputManager.GetButtonDown("Jump"))
         {
-            if (groundLeft || groundRight)
+            if ((groundLeft || groundRight) && ClemCAddons.Utilities.Timer.MinimumDelay(666,500))
             {
                 var l = transform.FindDeep("LeftLeg");
                 var r = transform.FindDeep("RightLeg");

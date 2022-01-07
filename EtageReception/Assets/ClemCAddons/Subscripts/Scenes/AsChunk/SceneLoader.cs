@@ -29,7 +29,7 @@ public class SceneLoader : MonoBehaviour
 
     void Update()
     {
-        if (ClemCAddons.Utilities.Timer.MinimumDelay(777, 0.1f))
+        if (ClemCAddons.Utilities.Timer.MinimumDelay(777, 100))
         {
             for (int i = 0; i < _scenesAreas.Names.Length; i++)
             {
