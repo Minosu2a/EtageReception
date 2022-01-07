@@ -98,10 +98,13 @@ public class RagdollController : MonoBehaviour
     {
         var l = transform.FindDeep("LeftLeg");
         var r = transform.FindDeep("RightLeg");
-        var lValue = l.lossyScale.y * _distanceFeetPerc;
-        var rValue = r.lossyScale.y * _distanceFeetPerc;
-        groundLeft = Physics.Linecast(l.position, l.position + l.forward.Down() * lValue, 1 << LayerMask.NameToLayer("Default"));
-        groundRight = Physics.Linecast(r.position, r.position + r.forward.Down() * rValue, 1 << LayerMask.NameToLayer("Default"));
+        var lValue = l.GetComponent<Renderer>().bounds.extents.y * 2 * _distanceFeetPerc;
+        var rValue = l.GetComponent<Renderer>().bounds.extents.y * 2 * _distanceFeetPerc;
+        var topl = l.GetComponent<Renderer>().bounds.center + Vector3.zero.SetY(l.GetComponent<Renderer>().bounds.extents.y);
+        var topr = l.GetComponent<Renderer>().bounds.center + Vector3.zero.SetY(r.GetComponent<Renderer>().bounds.extents.y);
+        Debug.DrawLine(topl, topl + l.forward.Down() * lValue, Color.red, 0.1f);
+        groundLeft = Physics.Linecast(topl, topl + l.forward.Down() * lValue, 1 << LayerMask.NameToLayer("Default"));
+        groundRight = Physics.Linecast(topr, topr + r.forward.Down() * rValue, 1 << LayerMask.NameToLayer("Default"));
     }
 
     void Update()
@@ -143,7 +146,7 @@ public class RagdollController : MonoBehaviour
         }
         if (InputManager.GetButtonDown("Jump"))
         {
-            if ((groundLeft || groundRight) && ClemCAddons.Utilities.Timer.MinimumDelay(666,500))
+            if ((groundLeft || groundRight) && ClemCAddons.Utilities.Timer.MinimumDelay(666,500, true))
             {
                 var l = transform.FindDeep("LeftLeg");
                 var r = transform.FindDeep("RightLeg");

@@ -2113,7 +2113,7 @@ namespace ClemCAddons
         #region Timer
         public class Timer
         {
-            public static bool MinimumDelay(int id, int duration, bool clearOnSuccess = true)
+            public static bool MinimumDelay(int id, int duration, bool firstTryPasses = false, bool clearOnSuccess = true)
             {
                 var c = timers.FindIndex(t => t.Key == id);
                 if (c != -1)
@@ -2137,7 +2137,7 @@ namespace ClemCAddons
                     timers.Add(new KeyValuePair<int, Stopwatch>(id, r));
                     if (duration == 0)
                         return true;
-                    return false;
+                    return firstTryPasses;
 
                 }
             }
