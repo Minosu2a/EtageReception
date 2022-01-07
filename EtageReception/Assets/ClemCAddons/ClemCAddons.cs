@@ -1043,19 +1043,29 @@ namespace ClemCAddons
         #endregion NormalizeTo
         #endregion Vector3 Additions
         #region Vector2 Additions
+        #region Value
+        public static Vector2 Abs(this Vector2 vector)
+        {
+            return new Vector2(vector.x.Abs(), vector.y.Abs());
+        }
+        #endregion Value
         #region Geometry
         public static Vector2 PointOnSlope(this Vector2 point, float distanceX, float angle)
         {
-            var hyp = distanceX / Mathf.Cos(angle);
-            var opposite = hyp * Mathf.Tan(angle); // distance down Y
-            return point + new Vector2(point.x + distanceX, point.y + opposite);
+            var r = angle.RadianToVector2();
+            return point + new Vector2(0, r.y.Abs());
         }
         public static Vector2 PointAtAngle(this Vector2 point, float distanceHypotenuse, float angle)
-        {// needs some checking, too tired
-            var hyp = distanceHypotenuse;
-            var side = hyp * Mathf.Cos(angle);
-            var opposite = hyp * Mathf.Sin(angle); // distance down Y
-            return point + new Vector2(point.x + side, point.y + opposite);
+        {
+            return point + (angle.DegreeToVector2() * distanceHypotenuse);
+        }
+        public static Vector2 DegreeToVector2(this float degree)
+        {
+            return (degree * Mathf.Deg2Rad).RadianToVector2();
+        }
+        public static Vector2 RadianToVector2(this float radian)
+        {
+            return new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
         }
         #endregion Geometry
         #region Direction
