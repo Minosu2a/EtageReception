@@ -100,8 +100,8 @@ public class RagdollController : MonoBehaviour
         var r = transform.FindDeep("RightLeg");
         var lValue = l.lossyScale.y * _distanceFeetPerc;
         var rValue = r.lossyScale.y * _distanceFeetPerc;
-        groundLeft = Physics.Linecast(l.position, l.position + l.forward.Down() * lValue * 2, 1 << LayerMask.NameToLayer("Default"));
-        groundRight = Physics.Linecast(r.position, r.position + r.forward.Down() * rValue * 2, 1 << LayerMask.NameToLayer("Default"));
+        groundLeft = Physics.Linecast(l.position, l.position + l.forward.Down() * lValue, 1 << LayerMask.NameToLayer("Default"));
+        groundRight = Physics.Linecast(r.position, r.position + r.forward.Down() * rValue, 1 << LayerMask.NameToLayer("Default"));
     }
 
     void Update()
