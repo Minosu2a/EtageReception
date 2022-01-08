@@ -1738,6 +1738,24 @@ MonoBehaviour:
         m_gamepadButton: 0
         m_gamepadAxis: 3
         m_gamepadIndex: 0
+    - m_name: UI_Left
+      m_description: 
+      m_bindings: []
+    - m_name: UI_Right
+      m_description: 
+      m_bindings: []
+    - m_name: UI_Up
+      m_description: 
+      m_bindings: []
+    - m_name: UI_Down
+      m_description: 
+      m_bindings: []
+    - m_name: UI_Submit
+      m_description: 
+      m_bindings: []
+    - m_name: UI_Cancel
+      m_description: 
+      m_bindings: []
   m_playerOneDefault: 85c52da314c14ce8bc1999635dc6e642
   m_playerTwoDefault: 
   m_playerThreeDefault: 
