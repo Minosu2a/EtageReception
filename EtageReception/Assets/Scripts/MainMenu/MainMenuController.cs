@@ -5,9 +5,18 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuController : MonoBehaviour
 {
+
+    private void Start()
+    {
+    }
     public void Play()
     {
         GameStateManager.Instance.LaunchTransition(EGameState.GAME);
+    }
+
+    public void HowToPlay()
+    {
+
     }
 
     public void Quit()

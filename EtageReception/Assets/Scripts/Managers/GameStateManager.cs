@@ -40,12 +40,12 @@ public class GameStateManager : Singleton<GameStateManager>
         gameState.Initialize(EGameState.GAME);
         _states.Add(EGameState.GAME, gameState);
 
-        GameState level1State = new GameState();
-        gameState.Initialize(EGameState.LEVEL1);
-        _states.Add(EGameState.LEVEL1, gameState);
+        LEVEL1State level1State = new LEVEL1State();
+        level1State.Initialize(EGameState.LEVEL1);
+        _states.Add(EGameState.LEVEL1, level1State);
 
         _currentState = EGameState.INITIALIZE;
-        CurrentState.EnterState();
+       //    CurrentState.EnterState();
     }
 
     protected override void Update()
@@ -58,7 +58,10 @@ public class GameStateManager : Singleton<GameStateManager>
     public void ChangeState(EGameState newState)
     {
         Debug.Log("Transition from " + _currentState + " to " + newState);
+
         CurrentState.ExitState();
+        _previousState = _currentState;
+
         _currentState = newState;
         CurrentState.EnterState();
     }
