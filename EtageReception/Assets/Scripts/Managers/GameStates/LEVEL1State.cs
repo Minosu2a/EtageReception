@@ -13,7 +13,7 @@ public class LEVEL1State : AGameState
     #region Methods
     public override void EnterState()
     {
-
+        AudioManager.Instance.PlayMusicWithFadeIn("M_Game", 1.5f);
     }
 
     public override void UpdateState()

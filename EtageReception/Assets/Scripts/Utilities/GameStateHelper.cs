@@ -21,14 +21,8 @@ public static class GameStateHelper
             case EGameState.GAME:
                 sceneName = "LysianeLD";
                 break;
-            case EGameState.BATTLE:
-                sceneName = "BattleScene";
-                break;
             case EGameState.LEVEL1:
-                sceneName = "AdrienLD";
-                break;
-            case EGameState.LEVEL2:
-                sceneName = "LysianeLD";
+                sceneName = "Level2";
                 break;
         }
         return sceneName;

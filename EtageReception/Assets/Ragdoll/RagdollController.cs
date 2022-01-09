@@ -352,6 +352,12 @@ public class RagdollController : MonoBehaviour
         }
         else if (_isGrabbing == true)
         {
+
+            if(InputManager.GetButtonDown("Eat"))
+            {
+                Destroy(_objectGrabbed);
+               // AudioManager.Instance.Start2DSound(); //Son de Miam
+            }
             ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
             fj.connectedBody = null;
             fj.xMotion = ConfigurableJointMotion.Free;
