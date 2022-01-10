@@ -107,21 +107,24 @@ namespace ClemCAddons
                 }
                 transform.LookAt(playerTransform.position + _offSetTurned + Vector3.up * _heightOffset);
             }
-
+            
             private void GetInputs()
             {
                 if (_scrollToZoom && InputManager.mouseScrollDelta.y != 0)
                     _zoom = (_zoom - InputManager.mouseScrollDelta.y * _scrollSensitivity * 10 * Time.smoothDeltaTime).Clamp(-_distance + 0.1f, _distance * 2);
                 float x = InputManager.GetAxis(_horizontalMovement);
                 float y = InputManager.GetAxis(_verticalMovement);
-                if (x != 0)
-                {
-                    _position = _position.Rotate(x * _inputSensitivity * Time.smoothDeltaTime, Vector3.up);
-                }
+
+                
                 if (y != 0)
                 {
-                    _position = _position.Rotate(y * _inputSensitivity * Time.smoothDeltaTime, Vector3.right);
+                    var t = Vector3.Slerp(_position, _position.magnitude * Vector3.up * Mathf.Sign(y), y.Abs() * 0.1f * _inputSensitivity * Time.deltaTime);
+                    if (t.Distance(Vector3.up * Math.Sign(y)) > 0.05)
+                        _position = t;
                 }
+                if (x != 0)
+                    _position = _position.Rotate(x * _inputSensitivity * Time.smoothDeltaTime * 5, Vector3.up);
+
                 var posNorm = _position.normalized;
                 if (_currentOffset == Vector2.zero)
                     _offSetTurned = Vector2.zero;
