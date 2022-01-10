@@ -76,7 +76,7 @@ namespace ClemCAddons
                         var res = new NodeContent
                         {
                             position = DefaultCameraPosition(player.position),
-                            rotation = new SerializableQuaternion(DefaultCameraQuaternion.eulerAngles),
+                            rotation = new SerializableQuaternion(DefaultCameraQuaternion),
                             type = NodeType.Relative
                         };
                         MoveToNode(res);
@@ -95,7 +95,7 @@ namespace ClemCAddons
                         var res = new NodeContent
                         {
                             position = DefaultCameraPosition(player.position),
-                            rotation = new SerializableQuaternion(DefaultCameraQuaternion.eulerAngles),
+                            rotation = new SerializableQuaternion(DefaultCameraQuaternion),
                             type = NodeType.Relative
                         };
                         MoveToNode(res);
