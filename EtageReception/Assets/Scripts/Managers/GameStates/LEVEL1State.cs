@@ -14,8 +14,7 @@ public class LEVEL1State : AGameState
     public override void EnterState()
     {
         AudioManager.Instance.PlayMusicWithFadeIn("M_Game2", 1.5f);
-        AudioManager.Instance.Start2DSound("Trump");
-
+        AudioManager.Instance.Start2DSound("S_Trump");
     }
 
     public override void UpdateState()
