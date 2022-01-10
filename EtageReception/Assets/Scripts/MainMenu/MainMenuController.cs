@@ -41,7 +41,7 @@ public class MainMenuController : MonoBehaviour
     private IEnumerator Loading(float timer)
     {
         yield return new WaitForSeconds(timer);
-        GameStateManager.Instance.LaunchTransition(EGameState.LEVEL1);
+        GameStateManager.Instance.LaunchTransition(EGameState.GAME);
 
     }
 }
