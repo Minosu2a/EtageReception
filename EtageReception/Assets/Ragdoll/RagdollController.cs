@@ -178,7 +178,7 @@ public class RagdollController : MonoBehaviour
             AudioManager.Instance.Start2DSound("S_Trump");
                 //Lancer une petite animation
         }
-        if(InputManager.GetButtonDown("Eat") && _objectGrabbed.tag == "Food")
+        if(InputManager.GetButtonDown("Eat") && _isGrabbing == true && _objectGrabbed.tag == "Food")
         {
             Debug.Log("AAAh");
             EatFood();
@@ -322,7 +322,7 @@ public class RagdollController : MonoBehaviour
         if (GrabDetection.GrabRangeObject.Count > 0)
         {
             float smallerDistance = 0;
-            int integerOfCloserObject = 0;
+            int integerOfCloserObject = -1;
 
             for (int i = 0; i < GrabDetection.GrabRangeObject.Count; i++)
             {
@@ -341,7 +341,13 @@ public class RagdollController : MonoBehaviour
                 }
             }
 
-            GameObject closestObject = GrabDetection.GrabRangeObject[integerOfCloserObject];
+            GameObject closestObject = null;
+
+            if (integerOfCloserObject != -1)
+            {
+                closestObject = GrabDetection.GrabRangeObject[integerOfCloserObject];
+            }
+
             return closestObject;
 
         }
@@ -351,10 +357,12 @@ public class RagdollController : MonoBehaviour
 
     public void Grab()
     {
-
+        Debug.Log(_isGrabbing);
         if (_isGrabbing == false)
         {
-            if ((_objectGrabbed = DetectObject()) != null)
+            _objectGrabbed = DetectObject();
+
+            if (_objectGrabbed != null)
             {
                 if (_objectGrabbed.GetComponent<ConfigurableJoint>() != null)
                 {
@@ -387,6 +395,8 @@ public class RagdollController : MonoBehaviour
 
      public void EatFood()
      {
+
+
             ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
             fj.connectedBody = null;
             fj.xMotion = ConfigurableJointMotion.Free;
@@ -403,12 +413,14 @@ public class RagdollController : MonoBehaviour
             _objectGrabbed.GetComponent<Rigidbody>().mass *= DivideBy;
             StartCoroutine(RemoveUnElongate(toRemove, 10));
             _objectGrabbed.SetActive(false);
-            _objectGrabbed = null;  
+        
  
      }
 
     private IEnumerator GrabE()
     {
+        _isGrabbing = true;
+
         ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
         _objectGrabbed.GetComponent<Rigidbody>().mass *= 1 / DivideBy;
         var closest = _objectGrabbed.GetComponent<Rigidbody>().ClosestPointOnBounds(TrompeRigidbody.transform.position);
@@ -448,7 +460,6 @@ public class RagdollController : MonoBehaviour
 
         fj.anchor = _objectGrabbed.transform.GetLocal(_objectGrabbed.transform.position.Direction(TrompeRigidbody.position)).normalized.NormalizeTo(_objectGrabbed.transform.lossyScale.Inverse() * 1.7f);
         //need to figure out WHY 1.7 in this particular project
-        _isGrabbing = true;
     }
 
     private IEnumerator CreateElongate(GameObject source, float speed, int chainLength = 1, Transform parent = null)

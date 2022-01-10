@@ -15845,7 +15845,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_TagString
-      value: Item
+      value: Food
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -26553,7 +26553,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_TagString
-      value: Item
+      value: Food
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -27398,7 +27398,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_TagString
-      value: Item
+      value: Food
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -34707,7 +34707,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_TagString
-      value: Item
+      value: Food
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -40126,7 +40126,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_TagString
-      value: Item
+      value: Food
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -47348,7 +47348,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_TagString
-      value: Item
+      value: Food
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -51766,7 +51766,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_TagString
-      value: Item
+      value: Food
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 6e616e7bf46c26748a153fac2d7b1293, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -73934,39 +73934,6 @@ MonoBehaviour:
         m_type: 7
         m_axis: 0
         m_joystick: 0
-        m_gamepadButton: 12
-        m_gamepadAxis: 0
-        m_gamepadIndex: 0
-    - m_name: Trump
-      m_description: 
-      m_bindings:
-      - m_positive: 97
-        m_negative: 0
-        m_deadZoneType: 0
-        m_deadZone: 0
-        m_gravity: 1
-        m_sensitivity: 1
-        m_scale: 1
-        m_snap: 0
-        m_invert: 0
-        m_type: 0
-        m_axis: 0
-        m_joystick: 0
-        m_gamepadButton: 0
-        m_gamepadAxis: 0
-        m_gamepadIndex: 0
-      - m_positive: 0
-        m_negative: 0
-        m_deadZoneType: 0
-        m_deadZone: 0
-        m_gravity: 1
-        m_sensitivity: 1
-        m_scale: 1
-        m_snap: 0
-        m_invert: 0
-        m_type: 7
-        m_axis: 0
-        m_joystick: 0
         m_gamepadButton: 11
         m_gamepadAxis: 0
         m_gamepadIndex: 0
@@ -76528,7 +76495,7 @@ ConfigurableJoint:
   m_Anchor: {x: 0, y: 0.0059999996, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 67.3967, y: 1.2090005, z: 35.297104}
+  m_ConnectedAnchor: {x: 71.213295, y: -0.033352852, z: 34.319252}
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 2
