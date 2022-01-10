@@ -6,10 +6,8 @@ public enum EGameState
     LOADING,
     MAINMENU,
     GAME,
-    BATTLE,
     LEVEL1,
     NONE,
-    LEVEL2
 }
 
 public enum ESoundType

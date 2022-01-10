@@ -19,16 +19,10 @@ public static class GameStateHelper
                 sceneName = "MainMenu";
                 break;
             case EGameState.GAME:
-                sceneName = "Game";
-                break;
-            case EGameState.BATTLE:
-                sceneName = "BattleScene";
+                sceneName = "LysianeLD";
                 break;
             case EGameState.LEVEL1:
-                sceneName = "AdrienLD";
-                break;
-            case EGameState.LEVEL2:
-                sceneName = "LysianeLD";
+                sceneName = "Level2";
                 break;
         }
         return sceneName;

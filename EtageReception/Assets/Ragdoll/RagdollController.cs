@@ -172,6 +172,11 @@ public class RagdollController : MonoBehaviour
         {
             Grab();
         }
+        if( Input.GetButtonDown("Trump"))
+        {
+            AudioManager.Instance.Start2DSound("S_Trump");
+                //Lancer une petite animation
+        }
         if(input == true)
         {
             if(ClemCAddons.Utilities.Timer.MinimumDelay("hellobitch".GetHashCode(), 1000))
@@ -352,6 +357,14 @@ public class RagdollController : MonoBehaviour
         }
         else if (_isGrabbing == true)
         {
+            Debug.Log("Test");
+
+            if (InputManager.GetButtonDown("Eat") && _objectGrabbed.tag == "Food")
+            {
+                Debug.Log("Test");
+                Destroy(_objectGrabbed);
+                AudioManager.Instance.Start2DSound("S_Eat"); //Son de Miam
+            }
             ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
             fj.connectedBody = null;
             fj.xMotion = ConfigurableJointMotion.Free;

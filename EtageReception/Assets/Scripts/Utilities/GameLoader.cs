@@ -7,7 +7,7 @@ public class GameLoader : MonoBehaviour
 {
     [SerializeField] private GameStateManager _gameStateManager = null;
     [SerializeField] private GameLoopManager _gameLoopManager = null;
-    [SerializeField] private InputManagerE _inputManager = null;
+    [SerializeField] private AudioManager _audioManager = null;
 
     [SerializeField] private EGameState _sceneToLoadFirst = EGameState.LEVEL1;
 
@@ -15,8 +15,9 @@ public class GameLoader : MonoBehaviour
     {
         _gameStateManager.Initialize();
         _gameLoopManager.Initialize();
-        //_inputManager.Initialize();
-        GameStateManager.Instance.LaunchTransition(_sceneToLoadFirst);
+        _audioManager.Initialize();
+
+GameStateManager.Instance.LaunchTransition(_sceneToLoadFirst);
     }
 
 
