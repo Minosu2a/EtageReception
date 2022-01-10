@@ -126,7 +126,15 @@ namespace Luminosity.IO
 			else
 			{
 				Debug.LogWarning("You have multiple InputManager instances in the scene!", gameObject);
-				Destroy(this);
+				Destroy(m_instance);
+				m_instance = this;
+				m_scanService = new ScanService();
+				m_services = new Dictionary<Type, IInputService>();
+				m_schemeLookup = new Dictionary<string, ControlScheme>();
+				m_schemeLookupByID = new Dictionary<string, ControlScheme>();
+				m_actionLookup = new Dictionary<string, Dictionary<string, InputAction>>();
+				AddDefaultServices();
+				Initialize();
 			}
 		}
 

@@ -172,7 +172,7 @@ public class RagdollController : MonoBehaviour
         {
             Grab();
         }
-        if( Input.GetButtonDown("Trump"))
+        if(InputManager.GetButtonDown("Trump"))
         {
             AudioManager.Instance.Start2DSound("S_Trump");
                 //Lancer une petite animation
