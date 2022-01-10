@@ -27,7 +27,7 @@ public class GrabDetection : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Item" || other.tag == "Key")
+        if (other.tag == "Item" || other.tag == "Key" || other.tag == "Food")
         {
             _grabRangeObjects.Add(other.gameObject);
         }
@@ -35,7 +35,7 @@ public class GrabDetection : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag == "Item" || other.tag == "Key")
+        if (other.tag == "Item" || other.tag == "Key" || other.tag == "Food")
         {
             _grabRangeObjects.Remove(other.gameObject);
         }

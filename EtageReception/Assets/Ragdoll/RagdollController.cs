@@ -172,10 +172,17 @@ public class RagdollController : MonoBehaviour
         {
             Grab();
         }
-        if( Input.GetButtonDown("Trump"))
+        if(InputManager.GetButtonDown("Eat") && _isGrabbing == false)
         {
+        
             AudioManager.Instance.Start2DSound("S_Trump");
                 //Lancer une petite animation
+        }
+        if(InputManager.GetButtonDown("Eat") && _objectGrabbed.tag == "Food")
+        {
+            Debug.Log("AAAh");
+            EatFood();
+            AudioManager.Instance.Start2DSound("S_Eat"); //Son de Miam
         }
         if(input == true)
         {
@@ -357,14 +364,7 @@ public class RagdollController : MonoBehaviour
         }
         else if (_isGrabbing == true)
         {
-            Debug.Log("Test");
-
-            if (InputManager.GetButtonDown("Eat") && _objectGrabbed.tag == "Food")
-            {
-                Debug.Log("Test");
-                Destroy(_objectGrabbed);
-                AudioManager.Instance.Start2DSound("S_Eat"); //Son de Miam
-            }
+                     
             ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
             fj.connectedBody = null;
             fj.xMotion = ConfigurableJointMotion.Free;
@@ -384,6 +384,28 @@ public class RagdollController : MonoBehaviour
         }
 
     }
+
+     public void EatFood()
+     {
+            ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
+            fj.connectedBody = null;
+            fj.xMotion = ConfigurableJointMotion.Free;
+            fj.yMotion = ConfigurableJointMotion.Free;
+            fj.zMotion = ConfigurableJointMotion.Free;
+            fj.anchor = Vector3.zero;
+            _isGrabbing = false;
+            var r = transform.FindDeep("TrunkTrashCan");
+            GameObject[] toRemove = new GameObject[] { };
+            for (int i = 0; i < r.childCount; i++)
+            {
+                toRemove = toRemove.Add(r.GetChild(i).gameObject);
+            }
+            _objectGrabbed.GetComponent<Rigidbody>().mass *= DivideBy;
+            StartCoroutine(RemoveUnElongate(toRemove, 10));
+            _objectGrabbed.SetActive(false);
+            _objectGrabbed = null;  
+ 
+     }
 
     private IEnumerator GrabE()
     {
