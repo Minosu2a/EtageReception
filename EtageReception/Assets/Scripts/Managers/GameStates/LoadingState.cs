@@ -35,8 +35,7 @@ public class LoadingState : AGameState
             sceneName = GameStateHelper.SetSceneName(GameStateManager.Instance.PreviousState);
             _prevOp = SceneManager.UnloadSceneAsync(sceneName);
         }
-
-        if(_nextOp != null && _prevOp != null && _isLoadFinish && !_isUnloadFinish)
+        if (_nextOp != null && _prevOp != null && _isLoadFinish && !_isUnloadFinish)
         {
             if(_prevOp.isDone && _nextOp.isDone)
             {
