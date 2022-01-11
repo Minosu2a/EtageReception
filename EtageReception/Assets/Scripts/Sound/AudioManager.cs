@@ -391,7 +391,6 @@ public class AudioManager : Singleton<AudioManager>
 
 
 
-
     #region 2DSound
 
     /// <summary>
@@ -436,8 +435,8 @@ public class AudioManager : Singleton<AudioManager>
        else if(rand > 40 && rand <= 60)
        {
             Start2DSound("S_Trump1");
-        }
-        else if(rand > 60 && rand <= 80)
+       }
+       else if(rand > 60 && rand <= 80)
        {
             Start2DSound("S_Trump2");
        }
@@ -457,12 +456,41 @@ public class AudioManager : Singleton<AudioManager>
        {
             Start2DSound("S_Trump6");
        }
-
-
-
-
     }
 
+
+    public void StartTrumpSound(string tag)
+    {
+        switch(tag)
+        {
+            case "Key":
+                Start2DSound("S_Grab_Key");
+                break;
+            case "Food":
+                Start2DSound("S_Grab_Food");
+                break;
+            case "Item":
+                int rand = Random.Range(0, 2);
+                switch(rand)
+                {
+                    case 0:
+                        Start2DSound("S_Grab_Box1");
+                        break;
+                    case 1:
+                        Start2DSound("S_Grab_Box2");
+                        break;
+                    case 2:
+                        Start2DSound("S_Grab_Box3");
+                        break;
+                }
+                break;
+        }
+    }
+
+    public void StartSpecialSound(SoundData data)
+    {
+        Start2DSound(data.name);
+    }
     #endregion 2DSound
 
 
