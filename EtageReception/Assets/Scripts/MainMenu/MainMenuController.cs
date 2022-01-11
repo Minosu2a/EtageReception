@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 public class MainMenuController : MonoBehaviour
 {
     [SerializeField] private Animator _fade = null;
+    [SerializeField] private GameObject _menuMain = null;
+    [SerializeField] private GameObject _howToPlayUI = null;
     private void Start()
     {
     }
@@ -16,19 +18,28 @@ public class MainMenuController : MonoBehaviour
         StartCoroutine(Loading(2.5f));
     }
 
-    public void HowToPlay()
+    public void OpenHowToPlay()
     {
+        _menuMain.SetActive(false);
+        _howToPlayUI.SetActive(true);
+        AudioManager.Instance.Start2DSound("S_UI");
+    }
 
+    public void CloseHowToPlay()
+    {
+        _menuMain.SetActive(true);
+        _howToPlayUI.SetActive(false);
+        AudioManager.Instance.Start2DSound("S_UI");
     }
 
     public void Trump()
     {
-        AudioManager.Instance.Start2DSound("S_Trump");
+        AudioManager.Instance.StartTrumpSound();
     }
 
     public void Quit()
     {
-        AudioManager.Instance.Start2DSound("S_Button");
+        AudioManager.Instance.Start2DSound("S_UI");
         StartCoroutine(Delay(2f));
         Application.Quit();
     }

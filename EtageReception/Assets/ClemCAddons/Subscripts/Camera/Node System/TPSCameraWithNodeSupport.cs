@@ -35,6 +35,8 @@ namespace ClemCAddons
             [SerializeField] private string _cameraHitTag = "Hittable";
             [SerializeField] private float _cameraBoomSmoothing = 0.05f;
             [SerializeField] private float _obstacleMinimumDistance = 0.1f;
+            [Header("Angle Limiting")]
+            [SerializeField] private float _topBottomLimit = 0.1f;
 
             private dynamic _player = null;
             private float _defaultDistance;
@@ -119,7 +121,7 @@ namespace ClemCAddons
                 if (y != 0)
                 {
                     var t = Vector3.Slerp(_position, _position.magnitude * Vector3.up * Mathf.Sign(y), y.Abs() * 0.1f * _inputSensitivity * Time.deltaTime);
-                    if (t.Distance(Vector3.up * Math.Sign(y)) > 0.05)
+                    if (t.Distance(Vector3.up * Math.Sign(y)) > _topBottomLimit)
                         _position = t;
                 }
                 if (x != 0)
