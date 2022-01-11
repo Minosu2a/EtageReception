@@ -459,7 +459,7 @@ public class AudioManager : Singleton<AudioManager>
     }
 
 
-    public void StartTrumpSound(string tag)
+    public void StartGrabSound(string tag)
     {
         switch(tag)
         {
