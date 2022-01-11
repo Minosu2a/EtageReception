@@ -985,7 +985,7 @@ MonoBehaviour:
   _gameStateManager: {fileID: 1138470570}
   _gameLoopManager: {fileID: 145277961}
   _audioManager: {fileID: 1319104248}
-  _sceneToLoadFirst: 2
+  _sceneToLoadFirst: 4
 --- !u!4 &1501937221
 Transform:
   m_ObjectHideFlags: 0
