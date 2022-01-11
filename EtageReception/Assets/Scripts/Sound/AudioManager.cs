@@ -423,6 +423,46 @@ public class AudioManager : Singleton<AudioManager>
         }
     }
 
+
+    public void StartTrumpSound()
+    {
+
+        int rand = Random.Range(0, 100);
+        
+       if(rand <= 40)
+       {
+            Start2DSound("S_Trump");
+       }
+       else if(rand > 40 && rand <= 60)
+       {
+            Start2DSound("S_Trump1");
+        }
+        else if(rand > 60 && rand <= 80)
+       {
+            Start2DSound("S_Trump2");
+       }
+       else if(rand > 80 && rand <= 85)
+       {
+            Start2DSound("S_Trump3");
+       }
+       else if(rand > 85 && rand <= 90)
+       {
+            Start2DSound("S_Trump4");
+       }
+       else if(rand > 90 && rand <= 95)
+       {
+            Start2DSound("S_Trump5");
+       }
+       else if (rand > 95 && rand <= 100)
+       {
+            Start2DSound("S_Trump6");
+       }
+
+
+
+
+    }
+
     #endregion 2DSound
 
 

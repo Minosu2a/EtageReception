@@ -544,6 +544,24 @@ MonoBehaviour:
   - {fileID: 11400000, guid: cec7636147f0cc04591534bc518f15c9, type: 2}
   - {fileID: 11400000, guid: 802eef234753f7247bc9f2dd27adbb47, type: 2}
   - {fileID: 11400000, guid: 12d31d265f9d7b147a10b7eb93f4e385, type: 2}
+  - {fileID: 11400000, guid: 430faa7b0e0a6cb479a25721a899180e, type: 2}
+  - {fileID: 11400000, guid: 025b9f2791f11de4eaafd84647e1e968, type: 2}
+  - {fileID: 11400000, guid: 3230ab86e05c165409c7aaecc2ad11b7, type: 2}
+  - {fileID: 11400000, guid: 08a5d0ef3a322eb44abe4585d073720a, type: 2}
+  - {fileID: 11400000, guid: 83a615879789c2b48bab5ba83cc856e2, type: 2}
+  - {fileID: 11400000, guid: 87437b5d216a3b24b87f7022d5ec076d, type: 2}
+  - {fileID: 11400000, guid: e94262024cf651a4fb76339ab9d8fb62, type: 2}
+  - {fileID: 11400000, guid: 8ad6a55c43122bc47b0e7e6a16f876cd, type: 2}
+  - {fileID: 11400000, guid: f3fe8ac22277df246a4a0a560841ea7c, type: 2}
+  - {fileID: 11400000, guid: b4a6f9eb7f668dd449d35e27e36cc614, type: 2}
+  - {fileID: 11400000, guid: 47450c2a30da5c0469f23f98cd335e17, type: 2}
+  - {fileID: 11400000, guid: 9ea88f1fe9eb3794facedf29cb4901e4, type: 2}
+  - {fileID: 11400000, guid: ae86fc81d48663544b0e5c7602fa4643, type: 2}
+  - {fileID: 11400000, guid: 4bf2ab9703ab8544c9d50889436e1ac2, type: 2}
+  - {fileID: 11400000, guid: 1a31eb13be8077341bae9cdae68520c5, type: 2}
+  - {fileID: 11400000, guid: c497382d074090b4a9962aecffcfe60f, type: 2}
+  - {fileID: 11400000, guid: 4be1d414455b2614ea7b326a5c7b5406, type: 2}
+  - {fileID: 11400000, guid: 513f86b54539dbd4fb646c825f142ee8, type: 2}
   _2DSoundSource: {fileID: 1452721898052342533, guid: ee161eb436a2ef543bdb3732e132f8d2, type: 3}
   _3DSoundSource: {fileID: 1452721898052342533, guid: be5d7cbb93a8e1a4c93ffa1dad46f7a0, type: 3}
   _2DRepetitiveSoundSource: {fileID: 1452721898052342533, guid: eed7cd97e23eeae4eb3213043b88e8ba, type: 3}
@@ -985,7 +1003,7 @@ MonoBehaviour:
   _gameStateManager: {fileID: 1138470570}
   _gameLoopManager: {fileID: 145277961}
   _audioManager: {fileID: 1319104248}
-  _sceneToLoadFirst: 4
+  _sceneToLoadFirst: 2
 --- !u!4 &1501937221
 Transform:
   m_ObjectHideFlags: 0

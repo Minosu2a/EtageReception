@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 87744370b371c984b82958ff44ebe188, type: 3}
-  m_Name: S_Grab_Bass 1
+  m_Name: S_Grab_Food
   m_EditorClassIdentifier: 
-  _key: S_Grab_Bass
-  _clip: {fileID: 8300000, guid: 29c0bf828f282004188401ca123b15f0, type: 3}
+  _key: S_Grab_Food
+  _clip: {fileID: 8300000, guid: 379919c475d6c7c4988ac1b335abbce4, type: 3}
   _description: 
   _volume: 1
   _pitch: 1
