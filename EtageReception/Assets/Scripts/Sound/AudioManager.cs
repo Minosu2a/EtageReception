@@ -464,10 +464,25 @@ public class AudioManager : Singleton<AudioManager>
         switch(tag)
         {
             case "Key":
+                Start2DSound("S_Grab_Key");
                 break;
             case "Food":
+                Start2DSound("S_Grab_Food");
                 break;
             case "Item":
+                int rand = Random.Range(0, 2);
+                switch(rand)
+                {
+                    case 0:
+                        Start2DSound("S_Grab_Box1");
+                        break;
+                    case 1:
+                        Start2DSound("S_Grab_Box2");
+                        break;
+                    case 2:
+                        Start2DSound("S_Grab_Box3");
+                        break;
+                }
                 break;
         }
     }
