@@ -12,12 +12,18 @@ public class MainMenuController : MonoBehaviour
     public void Play()
     {
         AudioManager.Instance.Start2DSound("S_Button");
-        GameStateManager.Instance.LaunchTransition(EGameState.LEVEL1);
+        _fade.SetTrigger("Transition");
+        StartCoroutine(Loading(2.5f));
     }
 
     public void HowToPlay()
     {
 
+    }
+
+    public void Trump()
+    {
+        AudioManager.Instance.Start2DSound("S_Trump");
     }
 
     public void Quit()
@@ -32,8 +38,10 @@ public class MainMenuController : MonoBehaviour
         yield return new WaitForSeconds(timer);
     }
 
-  /*  private IEnumerator Delay(float timer)
+    private IEnumerator Loading(float timer)
     {
         yield return new WaitForSeconds(timer);
-    }*/
+        GameStateManager.Instance.LaunchTransition(EGameState.GAME);
+
+    }
 }
