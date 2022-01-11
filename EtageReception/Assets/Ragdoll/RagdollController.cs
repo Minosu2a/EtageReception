@@ -31,6 +31,8 @@ public class RagdollController : MonoBehaviour
 
     private GameObject _objectGrabbed = null;
 
+    private int _trumpstate = 0;
+
     public Transform Root
     {
         get
@@ -172,7 +174,28 @@ public class RagdollController : MonoBehaviour
         {
             Grab();
         }
-        if(InputManager.GetButtonDown("Eat") && _isGrabbing == false)
+        if (InputManager.GetButtonDown("Straighten"))
+        {
+            switch (_trumpstate)
+            {
+                case 0:
+                    Straighten();
+                    _trumpstate++;
+                    break;
+                case 1:
+                    Flacidify();
+                    _trumpstate++;
+                    break;
+                case 2:
+                    UnStraighten();
+                    _trumpstate = 0;
+                    break;
+                default:
+                    _trumpstate = 0;
+                    break;
+            }
+        }
+        if (InputManager.GetButtonDown("Eat") && _isGrabbing == false)
         {
         
             AudioManager.Instance.Start2DSound("S_Trump");
@@ -357,7 +380,6 @@ public class RagdollController : MonoBehaviour
 
     public void Grab()
     {
-        Debug.Log(_isGrabbing);
         if (_isGrabbing == false)
         {
             _objectGrabbed = DetectObject();
@@ -503,4 +525,107 @@ public class RagdollController : MonoBehaviour
 
 
     #endregion Grab
+    #region Straighten
+    private void Straighten()
+    {
+        var list = new List<Transform>();
+        var parent = TrompeRigidbody.transform.parent;
+        for(int i = 0; i < parent.childCount; i++)
+        {
+            if(parent.GetChild(i).name != "TrunkTrashCan")
+            {
+                list.Add(parent.GetChild(i));
+            }
+            else
+            {
+                for(int f = 0; f < parent.GetChild(i).childCount; f++)
+                {
+                    list.Add(parent.GetChild(i).GetChild(f));
+                }
+            }
+        }
+        int num = list.Count;
+        foreach(Transform t in list)
+        {
+            var joint = t.GetComponent<ConfigurableJoint>().yDrive;
+            joint.positionSpring *= 10000;
+            t.GetComponent<ConfigurableJoint>().xDrive = t.GetComponent<ConfigurableJoint>().zDrive = joint;
+
+            t.GetComponent<ConfigurableJoint>().yDrive = joint;
+            t.GetComponent<ConfigurableJoint>().targetRotation = Quaternion.Euler(-2f*num, 0, 0);
+            var drive = t.GetComponent<ConfigurableJoint>().angularXDrive;
+            drive.positionSpring *= 10000;
+            t.GetComponent<ConfigurableJoint>().angularXDrive =
+                t.GetComponent<ConfigurableJoint>().angularYZDrive =
+                    drive;
+            num--;
+        }
+    }
+    private void UnStraighten()
+    {
+        var list = new List<Transform>();
+        var parent = TrompeRigidbody.transform.parent;
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            if (parent.GetChild(i).name != "TrunkTrashCan")
+            {
+                list.Add(parent.GetChild(i));
+            }
+            else
+            {
+                for (int f = 0; f < parent.GetChild(i).childCount; f++)
+                {
+                    list.Add(parent.GetChild(i).GetChild(f));
+                }
+            }
+        }
+        foreach (Transform t in list)
+        {
+            var joint = t.GetComponent<ConfigurableJoint>().yDrive;
+            joint.positionSpring = 10000;
+            t.GetComponent<ConfigurableJoint>().xDrive = t.GetComponent<ConfigurableJoint>().zDrive = new JointDrive();
+
+            t.GetComponent<ConfigurableJoint>().yDrive = joint;
+            t.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, 0, 0, 1);
+            var drive = t.GetComponent<ConfigurableJoint>().angularXDrive;
+            drive.positionSpring = 10000;
+            t.GetComponent<ConfigurableJoint>().angularXDrive =
+                t.GetComponent<ConfigurableJoint>().angularYZDrive =
+                    drive;
+        }
+    }
+    private void Flacidify()
+    {
+        var list = new List<Transform>();
+        var parent = TrompeRigidbody.transform.parent;
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            if (parent.GetChild(i).name != "TrunkTrashCan")
+            {
+                list.Add(parent.GetChild(i));
+            }
+            else
+            {
+                for (int f = 0; f < parent.GetChild(i).childCount; f++)
+                {
+                    list.Add(parent.GetChild(i).GetChild(f));
+                }
+            }
+        }
+        foreach (Transform t in list)
+        {
+            var joint = t.GetComponent<ConfigurableJoint>().yDrive;
+            joint.positionSpring = 0;
+            t.GetComponent<ConfigurableJoint>().xDrive = t.GetComponent<ConfigurableJoint>().zDrive = new JointDrive();
+
+            t.GetComponent<ConfigurableJoint>().yDrive = joint;
+            t.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, 0, 0, 1);
+            var drive = t.GetComponent<ConfigurableJoint>().angularXDrive;
+            drive.positionSpring = 0;
+            t.GetComponent<ConfigurableJoint>().angularXDrive =
+                t.GetComponent<ConfigurableJoint>().angularYZDrive =
+                    drive;
+        }
+    }
+    #endregion Straighten
 }
