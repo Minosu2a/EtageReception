@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
+using UnityEngine.UI;
 
 public class MainMenuController : MonoBehaviour
 {
     [SerializeField] private Animator _fade = null;
     [SerializeField] private GameObject _menuMain = null;
     [SerializeField] private GameObject _howToPlayUI = null;
+    [SerializeField] private Button _back = null;
+    [SerializeField] private Button _howToPlayButton = null;
+
+
     private void Start()
     {
     }
@@ -23,6 +29,7 @@ public class MainMenuController : MonoBehaviour
         _menuMain.SetActive(false);
         _howToPlayUI.SetActive(true);
         AudioManager.Instance.Start2DSound("S_UI");
+        _back.Select();
     }
 
     public void CloseHowToPlay()
@@ -30,6 +37,8 @@ public class MainMenuController : MonoBehaviour
         _menuMain.SetActive(true);
         _howToPlayUI.SetActive(false);
         AudioManager.Instance.Start2DSound("S_UI");
+        _howToPlayButton.Select();
+
     }
 
     public void Trump()

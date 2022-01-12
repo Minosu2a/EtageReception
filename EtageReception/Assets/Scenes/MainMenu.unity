@@ -3314,6 +3314,8 @@ MonoBehaviour:
   _fade: {fileID: 301889259}
   _menuMain: {fileID: 882089979}
   _howToPlayUI: {fileID: 1705730110}
+  _back: {fileID: 2094720826}
+  _howToPlayButton: {fileID: 1092369786}
 --- !u!114 &1742409070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3960,12 +3962,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 4
     m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
+    m_SelectOnUp: {fileID: 2094720826}
+    m_SelectOnDown: {fileID: 2094720826}
+    m_SelectOnLeft: {fileID: 2094720826}
+    m_SelectOnRight: {fileID: 2094720826}
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
