@@ -18,6 +18,8 @@ namespace ClemCAddons
     #region Extensions
     public static class Extensions
     {
+        #region Logic
+        #endregion Logic
         #region Type
         public static Type GetType(this string typeName)
         {
