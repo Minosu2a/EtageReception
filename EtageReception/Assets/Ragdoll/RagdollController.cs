@@ -543,13 +543,13 @@ public class RagdollController : MonoBehaviour
         foreach(Transform t in list)
         {
             var joint = t.GetComponent<ConfigurableJoint>().yDrive;
-            joint.positionSpring *= 10000;
+            joint.positionSpring = 10000000;
             t.GetComponent<ConfigurableJoint>().xDrive = t.GetComponent<ConfigurableJoint>().zDrive = joint;
 
             t.GetComponent<ConfigurableJoint>().yDrive = joint;
             t.GetComponent<ConfigurableJoint>().targetRotation = Quaternion.Euler(-2f*num, 0, 0);
             var drive = t.GetComponent<ConfigurableJoint>().angularXDrive;
-            drive.positionSpring *= 10000;
+            drive.positionSpring = 10000000;
             t.GetComponent<ConfigurableJoint>().angularXDrive =
                 t.GetComponent<ConfigurableJoint>().angularYZDrive =
                     drive;
