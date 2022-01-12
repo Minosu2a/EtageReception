@@ -30,7 +30,7 @@ public class PauseController : MonoBehaviour
 
     public void OpenPause()
     {
-        Time.timeScale = 0;
+        Time.timeScale = 0f;
         _menuMain.SetActive(true);
         _pauseOpen = true;
         _howToPlayButton.Select();
