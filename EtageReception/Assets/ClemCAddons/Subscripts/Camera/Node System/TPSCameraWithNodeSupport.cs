@@ -31,6 +31,8 @@ namespace ClemCAddons
             [SerializeField, DrawIf("_customPlayerClass", true, ComparisonType.Equals)] private string _playerClassName;
             [SerializeField] private bool _useDifferentTransform = false;
             [SerializeField, DrawIf("_useDifferentTransform", true, ComparisonType.Equals)] private Transform _differentTransform;
+            [SerializeField] private bool _inverseCamButton = false;
+            [SerializeField, DrawIf("_inverseCamButton", true, ComparisonType.Equals)] private string _inverseCamButtonName;
             [Header("Camera boom")]
             [SerializeField] private string _cameraHitTag = "Hittable";
             [SerializeField] private float _cameraBoomSmoothing = 0.05f;
@@ -51,6 +53,7 @@ namespace ClemCAddons
             private Vector3 _cheatOffsetTurned = Vector3.forward;
             private float _cameraBoomD = 0f;
             private float _zoom = 0;
+            private bool _camInversed;
 
             private bool isPlayerCharacterMovement
             {
@@ -115,7 +118,7 @@ namespace ClemCAddons
                 if (_scrollToZoom && InputManager.mouseScrollDelta.y != 0)
                     _zoom = (_zoom - InputManager.mouseScrollDelta.y * _scrollSensitivity * 10 * Time.smoothDeltaTime).Clamp(-_distance + 0.1f, _distance * 2);
                 float x = InputManager.GetAxis(_horizontalMovement);
-                float y = InputManager.GetAxis(_verticalMovement);
+                float y = InputManager.GetAxis(_verticalMovement) * (_camInversed?-1:1);
 
                 
                 if (y != 0)
@@ -133,6 +136,9 @@ namespace ClemCAddons
                 else
                     _offSetTurned = posNorm.Left() * _currentOffset.x + posNorm.Up() * _currentOffset.y;
                 _cheatOffsetTurned = Vector3.up * _currentCheatOffset;
+
+                if (_inverseCamButton && InputManager.GetButtonDown(_inverseCamButtonName))
+                    _camInversed = !_camInversed;
             }
 
             private void CamTriangulation(Transform player)
