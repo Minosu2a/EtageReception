@@ -174,11 +174,11 @@ public class RagdollController : MonoBehaviour
         {
             Grab();
         }
-        if (InputManager.GetButtonDown("TrunkUp") || InputManager.GetAxis("TrunkUp") > 0.5f)
+        if (InputManager.GetButtonDown("TrunkUp") || GameTools.OnceIfTrue(80087, InputManager.GetAxis("TrunkUp") > 0.5f))
         {
             Straighten();
         }
-        if (InputManager.GetButtonDown("TrunkDown") || InputManager.GetAxis("TrunkDown") > 0.5f)
+        if (InputManager.GetButtonDown("TrunkDown") || GameTools.OnceIfTrue(80088, InputManager.GetAxis("TrunkDown") > 0.5f))
             Flacidify();
         if (GameTools.OnceIfTrue(80085, InputManager.GetAxis("TrunkUp") < 0.5f) || GameTools.OnceIfTrue(80086, InputManager.GetAxis("TrunkDown") < 0.5f))
             UnStraighten();
