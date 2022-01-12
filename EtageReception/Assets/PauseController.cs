@@ -18,11 +18,11 @@ public class PauseController : MonoBehaviour
 
     private void Update()
     {
-        if(InputManager.GetButton("UI_Cancel") && _pauseOpen == false)
+        if(InputManager.GetButtonDown("UI_Cancel") && _pauseOpen == false)
         {
             OpenPause();
         }
-        else if(InputManager.GetButton("UI_Cancel") && _pauseOpen == true)
+        else if(InputManager.GetButtonDown("UI_Cancel") && _pauseOpen == true)
         {
             ClosePause();
         }
@@ -30,6 +30,7 @@ public class PauseController : MonoBehaviour
 
     public void OpenPause()
     {
+        Time.timeScale = 0;
         _menuMain.SetActive(true);
         _howToPlayButton.Select();
         _pauseOpen = true;
@@ -37,6 +38,7 @@ public class PauseController : MonoBehaviour
 
     public void ClosePause()
     {
+        Time.timeScale = 1;
         _menuMain.SetActive(false);
         _pauseOpen = false;
 
