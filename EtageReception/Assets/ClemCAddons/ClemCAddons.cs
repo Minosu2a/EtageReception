@@ -2123,10 +2123,15 @@ namespace ClemCAddons
                     var t = timers.Find(t => t.Key == id);
                     if (t.Value.ElapsedMilliseconds > duration)
                     {
+
                         if (clearOnSuccess)
                         {
                             t.Value.Stop();
                             timers.RemoveAt(c);
+                        }
+                        else
+                        {
+                            t.Value.Restart();
                         }
                         return true;
                     }

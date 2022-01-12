@@ -2815,12 +2815,12 @@ MonoBehaviour:
         m_sensitivity: 1
         m_scale: 1
         m_snap: 0
-        m_invert: 1
-        m_type: 8
+        m_invert: 0
+        m_type: 9
         m_axis: 0
         m_joystick: 0
         m_gamepadButton: 0
-        m_gamepadAxis: 0
+        m_gamepadAxis: 1
         m_gamepadIndex: 0
       - m_positive: 273
         m_negative: 274
@@ -2864,10 +2864,10 @@ MonoBehaviour:
         m_scale: 1
         m_snap: 0
         m_invert: 0
-        m_type: 8
+        m_type: 7
         m_axis: 0
         m_joystick: 0
-        m_gamepadButton: 0
+        m_gamepadButton: 5
         m_gamepadAxis: 0
         m_gamepadIndex: 0
       - m_positive: 0
@@ -2878,12 +2878,12 @@ MonoBehaviour:
         m_sensitivity: 1
         m_scale: 1
         m_snap: 0
-        m_invert: 0
-        m_type: 8
+        m_invert: 1
+        m_type: 9
         m_axis: 0
         m_joystick: 0
         m_gamepadButton: 5
-        m_gamepadAxis: 0
+        m_gamepadAxis: 1
         m_gamepadIndex: 0
       - m_positive: 273
         m_negative: 274
@@ -2942,11 +2942,11 @@ MonoBehaviour:
         m_scale: 1
         m_snap: 0
         m_invert: 1
-        m_type: 8
+        m_type: 9
         m_axis: 0
         m_joystick: 0
         m_gamepadButton: 0
-        m_gamepadAxis: 1
+        m_gamepadAxis: 0
         m_gamepadIndex: 0
     - m_name: UI_Right
       m_description: 
@@ -2990,11 +2990,11 @@ MonoBehaviour:
         m_scale: 1
         m_snap: 0
         m_invert: 0
-        m_type: 8
+        m_type: 9
         m_axis: 0
         m_joystick: 0
         m_gamepadButton: 0
-        m_gamepadAxis: 1
+        m_gamepadAxis: 0
         m_gamepadIndex: 0
     - m_name: UI_Submit
       m_description: 
