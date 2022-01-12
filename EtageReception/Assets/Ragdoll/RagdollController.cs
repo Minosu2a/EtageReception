@@ -174,27 +174,14 @@ public class RagdollController : MonoBehaviour
         {
             Grab();
         }
-        if (InputManager.GetButtonDown("Straighten"))
+        if (InputManager.GetButtonDown("TrunkUp"))
         {
-            switch (_trumpstate)
-            {
-                case 0:
-                    Straighten();
-                    _trumpstate++;
-                    break;
-                case 1:
-                    Flacidify();
-                    _trumpstate++;
-                    break;
-                case 2:
-                    UnStraighten();
-                    _trumpstate = 0;
-                    break;
-                default:
-                    _trumpstate = 0;
-                    break;
-            }
+            Straighten();
         }
+        else if (InputManager.GetButtonDown("TrunkDown"))
+            Flacidify();
+        if (InputManager.GetButtonUp("TrunkUp") || InputManager.GetButtonUp("TrunkDown"))
+            UnStraighten();
         if (InputManager.GetButtonDown("Eat") && _isGrabbing == false)
         {
         
