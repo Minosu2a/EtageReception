@@ -420,13 +420,13 @@ namespace Luminosity.IO
         private Vector2 GetRawMoveVector()
         {
             Vector2 move = Vector2.zero;
-            if(input.GetButtonDown(m_LeftButton))
+            if(input.GetAxisRaw(m_LeftButton) > 0 || input.GetButtonDown(m_LeftButton))
                 move.x = -1.0f;
-            if(input.GetButtonDown(m_RightButton))
+            if(input.GetAxisRaw(m_RightButton) > 0 || input.GetButtonDown(m_RightButton))
                 move.x = 1.0f;
-            if(input.GetButtonDown(m_UpButton))
+            if(input.GetAxisRaw(m_UpButton) > 0 || input.GetButtonDown(m_UpButton))
                 move.y = 1.0f;
-            if(input.GetButtonDown(m_DownButton))
+            if(input.GetAxisRaw(m_DownButton) > 0 || input.GetButtonDown(m_DownButton))
                 move.y = -1.0f;
 
             return move;

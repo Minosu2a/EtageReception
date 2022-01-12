@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 using ClemCAddons;
 using System.Linq;
 
+#if(UNITY_EDITOR)
 public class SerializationChecker
 {
     private const string _path = "Utilities/ClemCAddons/IgnoredFields.CAddons";
@@ -276,3 +277,4 @@ public class SerializationChecker
     }
 
 }
+#endif
