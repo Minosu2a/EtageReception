@@ -20,13 +20,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Level2.unity
     guid: 2071f355c09da8b458276590601cb8c8
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/AdrienLD.unity
     guid: 191617a737de21f44b91ce1093128ae7
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Game.unity
     guid: ab853d6cca99f1e4880c981dabf2c9db
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ClemWorkingScene.unity
     guid: f1670d2ebc39fba458fc4ce0955377f4
   m_configObjects: {}
