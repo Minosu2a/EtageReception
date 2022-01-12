@@ -18,7 +18,26 @@ namespace ClemCAddons
     #region Extensions
     public static class Extensions
     {
+        private static List<KeyValuePair<int, bool>> GateMemory = new List<KeyValuePair<int, bool>>();
         #region Logic
+        public static bool OnceIfTrue(this bool value, int id)
+        {
+            var c = GateMemory.FindIndex(t => t.Key == id);
+            if (c != -1)
+            {
+                bool t = value;
+                if (value)
+                    GateMemory[c] = new KeyValuePair<int, bool>(id, false);
+                if (!value)
+                    GateMemory[c] = new KeyValuePair<int, bool>(id, true);
+                return GateMemory[c].Value && t;
+            }
+            else
+            {
+                GateMemory.Add(new KeyValuePair<int, bool>(id, !value));
+                return value;
+            }
+        }
         #endregion Logic
         #region Type
         public static Type GetType(this string typeName)
@@ -1627,6 +1646,26 @@ namespace ClemCAddons
         #region Utilities
         public class GameTools
         {
+            #region Logic
+            private static List<KeyValuePair<int, bool>> GateMemory = new List<KeyValuePair<int, bool>>();
+            public static bool OnceIfTrue(int id, bool value)
+            {
+                var c = GateMemory.FindIndex(t => t.Key == id);
+                if(c != -1)
+                {
+                    bool t = value;
+                    if (value)
+                        GateMemory[c] = new KeyValuePair<int, bool>(id, false);
+                    if(!value)
+                        GateMemory[c] = new KeyValuePair<int, bool>(id, true);
+                    return GateMemory[c].Value && t;
+                } else
+                {
+                    GateMemory.Add(new KeyValuePair<int, bool>(id, !value));
+                    return value;
+                }
+            }
+            #endregion Logic
             #region Vector3 Additions
             public static Vector3 Rotate(Vector3 vector, float angle, Vector3 axis) // https://answers.unity.com/questions/46770/rotate-a-vector3-direction.html
             {
