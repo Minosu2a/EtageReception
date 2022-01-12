@@ -14,6 +14,7 @@ public class GameState : AGameState
     public override void EnterState()
     {
         AudioManager.Instance.PlayMusicWithFadeIn("M_Game", 2f);
+
     }
 
     public override void UpdateState()

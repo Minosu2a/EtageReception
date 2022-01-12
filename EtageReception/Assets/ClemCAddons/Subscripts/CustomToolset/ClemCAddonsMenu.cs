@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
+#if(UNITY_EDITOR)
 public class ClemCAddonsMenu
 {
     private static GameObject _toRename;
@@ -176,3 +177,4 @@ public class ClemCAddonsMenu
     }
 
 }
+#endif

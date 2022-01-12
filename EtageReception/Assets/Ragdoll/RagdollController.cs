@@ -178,9 +178,11 @@ public class RagdollController : MonoBehaviour
         {
             Straighten();
         }
-        else if (InputManager.GetButtonDown("TrunkDown") || InputManager.GetAxis("TrunkDown") > 0.5f)
+        if (InputManager.GetButtonDown("TrunkDown") || InputManager.GetAxis("TrunkDown") > 0.5f)
             Flacidify();
-        if ((InputManager.GetButtonUp("TrunkUp") && InputManager.GetAxis("TrunkUp") < 0.5f) || (InputManager.GetButtonUp("TrunkDown") && InputManager.GetAxis("TrunkDown") < 0.5f))
+        if (GameTools.OnceIfTrue(80085, InputManager.GetAxis("TrunkUp") < 0.5f) || GameTools.OnceIfTrue(80086, InputManager.GetAxis("TrunkDown") < 0.5f))
+            UnStraighten();
+        if (InputManager.GetButtonUp("TrunkUp") || InputManager.GetButtonUp("TrunkDown"))
             UnStraighten();
         if (InputManager.GetButtonDown("Eat") && _isGrabbing == false)
         {
@@ -377,7 +379,14 @@ public class RagdollController : MonoBehaviour
                 {
                     if(_objectGrabbed.GetComponent<SpecialSound>() != null)
                     {
-                        AudioManager.Instance.StartSpecialSound(_objectGrabbed.GetComponent<SpecialSound>().Sound);
+                        if(_objectGrabbed.GetComponent<ChangeMusic>() == null)
+                        {
+                            AudioManager.Instance.StartSpecialSound(_objectGrabbed.GetComponent<SpecialSound>().Sound);
+                        }
+                        else
+                        {
+                            _objectGrabbed.GetComponent<ChangeMusic>().MusicChange();
+                        }
                     }
                     else
                     {

@@ -28,6 +28,7 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
+using ClemCAddons.Utilities;
 
 namespace Luminosity.IO
 {
@@ -198,10 +199,10 @@ namespace Luminosity.IO
             var shouldActivate = m_ForceModuleActive;
             shouldActivate |= input.GetButtonDown(m_SubmitButton);
             shouldActivate |= input.GetButtonDown(m_CancelButton);
-            shouldActivate |= input.GetButtonDown(m_UpButton);
-            shouldActivate |= input.GetButtonDown(m_DownButton);
-            shouldActivate |= input.GetButtonDown(m_LeftButton);
-            shouldActivate |= input.GetButtonDown(m_RightButton);
+            shouldActivate |= (input.GetAxisRaw(m_UpButton) > 0.5 && ClemCAddons.Utilities.Timer.MinimumDelay(111, 250, true, false)) || input.GetButtonDown(m_UpButton);
+            shouldActivate |= (input.GetAxisRaw(m_DownButton) > 0.5 && ClemCAddons.Utilities.Timer.MinimumDelay(112, 250, true, false)) || input.GetButtonDown(m_DownButton);
+            shouldActivate |= (input.GetAxisRaw(m_LeftButton) > 0.5 && ClemCAddons.Utilities.Timer.MinimumDelay(113, 250, true, false)) || input.GetButtonDown(m_LeftButton);
+            shouldActivate |= (input.GetAxisRaw(m_RightButton) > 0.5 && ClemCAddons.Utilities.Timer.MinimumDelay(114, 250, true, false)) || input.GetButtonDown(m_RightButton);
             shouldActivate |= (m_MousePosition - m_LastMousePosition).sqrMagnitude > 0.0f;
             shouldActivate |= input.GetMouseButtonDown(0);
 
@@ -420,15 +421,14 @@ namespace Luminosity.IO
         private Vector2 GetRawMoveVector()
         {
             Vector2 move = Vector2.zero;
-            if(input.GetButtonDown(m_LeftButton))
+            if(input.GetAxisRaw(m_LeftButton) > 0.5 && ClemCAddons.Utilities.Timer.MinimumDelay(211, 250, true, false) || input.GetButtonDown(m_LeftButton))
                 move.x = -1.0f;
-            if(input.GetButtonDown(m_RightButton))
+            if(input.GetAxisRaw(m_RightButton) > 0.5 && ClemCAddons.Utilities.Timer.MinimumDelay(212, 250, true, false) || input.GetButtonDown(m_RightButton))
                 move.x = 1.0f;
-            if(input.GetButtonDown(m_UpButton))
+            if(input.GetAxisRaw(m_UpButton) > 0.5 && ClemCAddons.Utilities.Timer.MinimumDelay(213, 250, true, false) || input.GetButtonDown(m_UpButton))
                 move.y = 1.0f;
-            if(input.GetButtonDown(m_DownButton))
+            if(input.GetAxisRaw(m_DownButton) > 0.5 && ClemCAddons.Utilities.Timer.MinimumDelay(214, 250, true, false) || input.GetButtonDown(m_DownButton))
                 move.y = -1.0f;
-
             return move;
         }
 
