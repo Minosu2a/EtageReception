@@ -184,8 +184,8 @@ public class RagdollController : MonoBehaviour
             UnStraighten();
         if (InputManager.GetButtonDown("Eat") && _isGrabbing == false)
         {
-        
-            AudioManager.Instance.Start2DSound("S_Trump");
+
+            AudioManager.Instance.StartTrumpSound();
                 //Lancer une petite animation
         }
         if(InputManager.GetButtonDown("Eat") && _isGrabbing == true && _objectGrabbed.tag == "Food")
@@ -389,7 +389,7 @@ public class RagdollController : MonoBehaviour
         }
         else if (_isGrabbing == true)
         {
-                     
+            AudioManager.Instance.Start2DSound("S_UnGrab");
             ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
             fj.connectedBody = null;
             fj.xMotion = ConfigurableJointMotion.Free;
@@ -543,13 +543,13 @@ public class RagdollController : MonoBehaviour
         foreach(Transform t in list)
         {
             var joint = t.GetComponent<ConfigurableJoint>().yDrive;
-            joint.positionSpring *= 10000;
+            joint.positionSpring = 10000000;
             t.GetComponent<ConfigurableJoint>().xDrive = t.GetComponent<ConfigurableJoint>().zDrive = joint;
 
             t.GetComponent<ConfigurableJoint>().yDrive = joint;
             t.GetComponent<ConfigurableJoint>().targetRotation = Quaternion.Euler(-2f*num, 0, 0);
             var drive = t.GetComponent<ConfigurableJoint>().angularXDrive;
-            drive.positionSpring *= 10000;
+            drive.positionSpring = 10000000;
             t.GetComponent<ConfigurableJoint>().angularXDrive =
                 t.GetComponent<ConfigurableJoint>().angularYZDrive =
                     drive;
