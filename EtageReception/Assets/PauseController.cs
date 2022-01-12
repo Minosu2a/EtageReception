@@ -32,8 +32,11 @@ public class PauseController : MonoBehaviour
     {
         Time.timeScale = 0;
         _menuMain.SetActive(true);
-        _howToPlayButton.Select();
         _pauseOpen = true;
+        _howToPlayButton.Select();
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void ClosePause()
@@ -42,6 +45,8 @@ public class PauseController : MonoBehaviour
         _menuMain.SetActive(false);
         _pauseOpen = false;
 
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void OpenHowToPlay()

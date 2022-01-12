@@ -8,6 +8,8 @@ public class TipsController : MonoBehaviour
 
     [SerializeField] private GameObject _mouseMoveTips = null;
     [SerializeField] private GameObject _padMoveTips = null;
+    [SerializeField] private GameObject _keyTips = null;
+
 
     private bool _tips;
 
@@ -15,7 +17,8 @@ public class TipsController : MonoBehaviour
 
     void Start()
     {
-        
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Update()
@@ -44,17 +47,19 @@ public class TipsController : MonoBehaviour
 
     IEnumerator Tips()
     {
-        float duration = 8f;
+        float duration = 18f;
         while(duration > 0)
         {
             if (_tips == true)
             {
                 _padMoveTips.SetActive(true);
+                _keyTips.SetActive(true);
                 _mouseMoveTips.SetActive(false);
             }
             else
             {
                 _mouseMoveTips.SetActive(true);
+                _keyTips.SetActive(true);
                 _padMoveTips.SetActive(false);
             }
             duration -= Time.deltaTime;
@@ -62,5 +67,7 @@ public class TipsController : MonoBehaviour
         }
         _padMoveTips.SetActive(false);
         _mouseMoveTips.SetActive(false);
+        _keyTips.SetActive(false);
+
     }
 }
