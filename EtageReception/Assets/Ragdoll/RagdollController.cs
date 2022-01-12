@@ -184,8 +184,8 @@ public class RagdollController : MonoBehaviour
             UnStraighten();
         if (InputManager.GetButtonDown("Eat") && _isGrabbing == false)
         {
-        
-            AudioManager.Instance.Start2DSound("S_Trump");
+
+            AudioManager.Instance.StartTrumpSound();
                 //Lancer une petite animation
         }
         if(InputManager.GetButtonDown("Eat") && _isGrabbing == true && _objectGrabbed.tag == "Food")
@@ -389,7 +389,7 @@ public class RagdollController : MonoBehaviour
         }
         else if (_isGrabbing == true)
         {
-                     
+            AudioManager.Instance.Start2DSound("S_UnGrab");
             ConfigurableJoint fj = _objectGrabbed.GetComponent<ConfigurableJoint>();
             fj.connectedBody = null;
             fj.xMotion = ConfigurableJointMotion.Free;
