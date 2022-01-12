@@ -377,7 +377,14 @@ public class RagdollController : MonoBehaviour
                 {
                     if(_objectGrabbed.GetComponent<SpecialSound>() != null)
                     {
-                        AudioManager.Instance.StartSpecialSound(_objectGrabbed.GetComponent<SpecialSound>().Sound);
+                        if(_objectGrabbed.GetComponent<ChangeMusic>() == null)
+                        {
+                            AudioManager.Instance.StartSpecialSound(_objectGrabbed.GetComponent<SpecialSound>().Sound);
+                        }
+                        else
+                        {
+                            _objectGrabbed.GetComponent<ChangeMusic>().MusicChange();
+                        }
                     }
                     else
                     {
